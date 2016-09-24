@@ -1,8 +1,14 @@
 function toggleObjectDiv()
 {
 	// make the div containing fields under this object show/hide
+	if(this.classList.contains('closed'))
+		this.classList.remove('closed');
+	else
+		this.classList.add('closed');
+	/* old version
 	if(this.nextElementSibling && this.nextElementSibling.classList.contains('object'))
 		this.nextElementSibling.style.display = (this.nextElementSibling.style.display=='none' ? 'block' : 'none');
+	*/
 }
 function valueString(a)
 {
@@ -38,6 +44,11 @@ function* ObjectDisplayer(obj, target, skipField)
 		var targetDOM = item.dom;
 		// clean the DOM to show
 		targetDOM.innerHTML = '';
+		// close too big object in the first
+		if(Object.keys(targetObj)
+			.filter((k)=>(skipField.indexOf(k)<0)&&(typeof targetObj[k]!='function'))
+			.length > 15 )
+			targetDOM.previousElementSibling.classList.add('closed');
 		// for all keys in the object
 		for(let k in targetObj)
 		{
@@ -49,7 +60,7 @@ function* ObjectDisplayer(obj, target, skipField)
 			
 			// create head for the field
 			var pdiv = targetDOM.insertBefore(document.createElement('div'),null);
-			pdiv.classList.add('property');
+			pdiv.classList.add('field');
 			pdiv.style.paddingLeft = '10px';
 			pdiv.innerHTML = '' + k + ': ' + valueString(targetObj[k]);
 			pdiv.onclick = toggleObjectDiv;
@@ -71,9 +82,18 @@ function* ObjectDisplayer(obj, target, skipField)
 		if(propertyCount > 1000)
 		{
 			// this tree is too large.
-			alert('displayObj paused.');
+			// alert('displayObj paused.');
+			let pausedMark = target.insertBefore(document.createElement('span'),null);
+			pausedMark.innerHTML = 'PAUSED';
+			pausedMark.style.color = 'white';
+			pausedMark.style.background = 'red';
 			yield propertyCount;
+			pausedMark.remove();
 		}
 	}
-	alert('displayObj done.');
+	let doneMark = target.insertBefore(document.createElement('span'),null);
+	doneMark.innerHTML = 'DONE';
+	doneMark.style.color = 'white';
+	doneMark.style.background = 'blue';
+	// alert('displayObj done.');
 }

@@ -1,0 +1,30 @@
+body {
+  display: flex;
+  flex-flow: row wrap; 
+}
+
+.topScreen {
+	flex: 1;
+	border-style: inset;
+}
+
+.field {
+	padding-left: 10px;
+}
+.object {
+	padding-left: 20px;
+}
+
+.field.closed + .object, .objectName.closed + .object {
+	display: none;
+}
+
+.field.closed, .objectName.closed {
+	text-decoration: underline;
+}
+
+.guiScreen {
+	min-width: 400px;
+	max-width: 800px;
+	height: 300px;
+}
