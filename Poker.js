@@ -22,7 +22,7 @@ Object.assign(game, {
 		}),
 	outDeck : Object.defineProperties(
 		new Deck(), {
-			'defaultCanSee': {value: new Set()},
+			'defaultCanSee': {value: new Set(['all'])},
 			'showPart': {value: 'main top'},
 		}),
 	currentPlayer : null,
