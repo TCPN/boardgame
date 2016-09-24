@@ -6,12 +6,43 @@ function Game()
 		for(i=0;i<number;i++) this.players.push(new Player());
 		return this;
 	}
+	this.skipFieldWhenView = new Set(['parent','cards','coverable','rank','canSee','defaultCanSee','skipFieldWhenView']);
 	this.inViewOf = function(player)
 	{
 		var view = {};
-		if(player in players)
+		if(this.players.indexOf(player) > -1)
 		{
-			
+			var fieldQueue = [{src: this, dst: view}];
+			while(fieldQueue.length > 0)
+			{
+				let dq = fieldQueue.shift();
+				var sourceObj = dq.src;
+				var destObj = dq.dst;
+				destObj.type = sourceObj.constructor.name
+				if(sourceObj.canSee == undefined || sourceObj.canSee.has(player) || sourceObj.canSee.has('all'))
+				{
+					for(let k in sourceObj)
+					{
+						if(this.skipFieldWhenView.has(k))
+							continue;
+						switch(typeof sourceObj[k])
+						{
+							case 'function':
+							case 'symbol':
+								continue;
+							case 'number':
+							case 'string':
+							case 'boolean':
+								destObj[k] = sourceObj[k];
+								break;
+							case 'object':
+								destObj[k] = (sourceObj[k].constructor == Array ? [] : {});
+								fieldQueue.push({src: sourceObj[k], dst: destObj[k]});
+								break;
+						}
+					}
+				}
+			}
 		}
 		return view;
 	}

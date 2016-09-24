@@ -13,6 +13,7 @@ for(let s=0;s<4;s++)
 	
 	
 game = new Game().setPlayerNumber(2);
+game.skipFieldWhenView.add('initDeck');
 Object.assign(game, {
 	initDeck : cards,
 	poolDeck : Object.defineProperties(
