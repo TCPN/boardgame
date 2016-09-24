@@ -3,13 +3,28 @@ var ranks = ['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
 var suits = ['Spade', 'Heart', 'Club', 'Diamond'];
 for(let s=0;s<4;s++)
 	for(let r=0;r<13;r++)
-		cards.push(new Card({point: r+1, rank: ranks[r], suit: suits[s]}));
+	{
+		let newcard = new Card({point: r+1, rank: ranks[r], suit: suits[s]});
+		newcard.toString = function PokerCardStringify(){	return this.suit + ' ' + this.point; };
+		cards.push(newcard);
+	}
 
+
+	
+	
 game = new Game().setPlayerNumber(2);
 Object.assign(game, {
 	initDeck : cards,
-	poolDeck : new Deck(),
-	outDeck : new Deck(),
+	poolDeck : Object.defineProperties(
+		new Deck(), {
+			'canSee': {value: new Set()},
+			'showPart': {value: 'top'},
+		}),
+	outDeck : Object.defineProperties(
+		new Deck(), {
+			'canSee': {value: new Set()},
+			'showPart': {value: 'main top'},
+		}),
 	currentPlayer : null,
 	conPass : 0,
 	isEnd : false,
@@ -17,7 +32,11 @@ Object.assign(game, {
 game.players.forEach(function(p,i){
 	Object.assign(p, {
 		seq : (i+1),
-		handDeck : new Deck(),
+		handDeck : Object.defineProperties(
+			new Deck(), {
+				'canSee': {value: new Set([p])},
+				'showPart': {value: 'all'},
+			}),
 		score : 0,
 	});
 })
@@ -43,39 +62,43 @@ var gameProgress = function* ()
 	Game.move(game.poolDeck.topCard(1), game.outDeck)
 	game.currentPlayer = game.players[0];
 	
+	var outCardVerify = function outCardVerify(choice)
+	{
+		if(choice == "pass")
+			return {isLegal: true};
+		else
+		{
+			let lastPoint = game.outDeck.bottomCard(1).point;
+			var passPoint = [lastPoint-3, lastPoint, lastPoint+1, lastPoint+2, lastPoint+3].map((v)=>((v+12)%13+1));
+			if(choice.suit == game.outDeck.bottomCard(1).suit && choice.point == passPoint[0])
+				return {isLegal: false, message: 'No down when same suit'};
+			else if(passPoint.indexOf(choice.point) > -1)
+				return {isLegal: true};
+			else
+				return {isLegal: false, message: 'Invalid point'};
+		}
+	}
+	
 	while(true)
 	{
+		var msg = "CurrentPlayerPlay";
 		while(1)
 		{
 			//var choice = yield AUserChoice(new Set([game.currentPlayer]), new Set(game.currentPlayer.handDeck.cards).add("pass"));
-			var msg = "CurrentPlayerPlay";
 			var choice = yield AUserChoice(
 				msg,
 				[].concat(game.currentPlayer),
-				[].concat(game.currentPlayer.handDeck.cards).concat("pass")
+				[].concat(game.currentPlayer.handDeck.cards).concat("pass").filter((v)=>outCardVerify(v).isLegal)
 				);
+			msg = "CurrentPlayerPlayed";
 			//verify
-			if(choice == "pass")
-				break;
-			else if(choice.suit == game.outDeck.topCard(1).suit)
-			{
-				msg = msg + ", suit rule";
-				continue;
-			}
-			else if(choice.point == game.outDeck.topCard(1).point)
+			var res = outCardVerify(choice);
+			if(res.isLegal)
 				break;
 			else
 			{
-				let s = choice.point + game.outDeck.topCard(1).point;
-				let d = Math.abs(choice.point - game.outDeck.topCard(1).point);
-				if(game.outDeck.topCard(1).point == 10 || choice.point == 10
-					|| s == 10 || s == 7 || d == 10 || d == 7)
-					break;
-				else
-				{
-					msg = msg + ", point rule";
-					continue;
-				}
+				msg = msg + ', but ' + res.message;
+				continue;
 			}
 		}
 		if(choice != "pass")
@@ -102,7 +125,9 @@ var gameProgress = function* ()
 		p.point = s;
 	});
 	return {
-		points: game.players.map((p)=>p.point),
+		message: 'GameEnd',
+		points: game.players.map((p)=>p.handDeck.length),
 		winner: game.players.reduce((bp,cp)=>(cp.point < bp.point ? cp : bp),game.currentPlayer),
 	};
 }
+
