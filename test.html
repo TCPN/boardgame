@@ -2,8 +2,29 @@
 <html>
 <head>
 	<title>Test</title>
+	<link href="style.css" rel="stylesheet" type="text/css">
+	<style></style>
 </head>
 <body>
+<div class="topScreen guiScreen" id='gui_1'>
+<image style="background: url(); height: 25%;">
+</div>
+<div class="topScreen guiScreen" id='gui_2'>
+</div>
+<div class="topScreen">
+	<div>Message: <span id="messageDisplay"></span></div>
+	<div>Current Player: <span id="playerDisplay"></span></div>
+	<select id="selectOpt">
+	</select>
+	<input id="confirmSelect" type="button" value="Confirm"></input>
+	<div class="objectName">Returned Options</div>
+	<div class="object" id="returnedOptionsDisplay"></div>
+</div>
+<div class="topScreen">
+	<div class="objectName">Game Status</div>
+	<div class="object" id="gameStatusDisplay"></div>
+</div>
+<script src="ObjectExt.js"></script>
 <script src="ArrayExt.js"></script>
 <script src="MathExt.js"></script>
 <script src="Token.js"></script>
@@ -15,13 +36,59 @@
 <script src="Game.js"></script>
 <script src="Poker.js"></script>
 <script src="ObjectDisplayer.js"></script>
-<script language="javascript">
-debugger;
+<script language="javascript" defer>
+// debugger;
 
-var prog = gameProgress();
-console.log(sta = prog.next());
-var show = ObjectDisplayer(sta,null,['parent','cards','coverable','rank']);
-show.next();
+var progress = gameProgress();
+var optSta;
+var selOpt;
+var printOpt;
+var printGame;
+progressGo();
+
+function progressGo()
+{
+	//console.log(optSta = progress.next(selOpt));
+	optSta = progress.next(selOpt);
+	// show game
+	document.getElementById('gameStatusDisplay').previousElementSibling.onclick=toggleObjectDiv;
+	printGame = ObjectDisplayer(game,document.getElementById('gameStatusDisplay'),['parent','cards','coverable','rank']);
+	printGame.next();
+	// show ending message
+	if(optSta.done)
+	{
+		document.getElementById('playerDisplay').style.display='none';
+		document.getElementById('selectOpt').style.display='none';
+		document.getElementById('confirmSelect').style.display='none';
+		document.getElementById('returnedOptionsDisplay').style.display='none';
+		document.getElementById('messageDisplay').innerHTML = optSta.value.message +
+			', Winner: Player '+optSta.value.winner.seq + ', (Scores: ' + optSta.value.points.join(':') + ')';
+			return;
+	}
+	// show game progress response
+	document.getElementById('returnedOptionsDisplay').previousElementSibling.onclick=toggleObjectDiv;
+	printOpt = ObjectDisplayer(optSta,document.getElementById('returnedOptionsDisplay'),['parent','cards','coverable','rank']);
+	printOpt.next();
+	// show options and message
+	document.getElementById('messageDisplay').innerHTML = optSta.value.message;
+	document.getElementById('playerDisplay').innerHTML = 'Player ' + optSta.value.choosers[0].seq;
+	var sel = document.getElementById('selectOpt');
+	sel.innerHTML = '';
+	for(var i=0; i < optSta.value.options.length; i ++)
+	{
+		let newOpt = document.createElement('option');
+		newOpt.innerHTML = optSta.value.options[i].toString();
+		newOpt.value = i;
+		sel.add(newOpt);
+	}
+}
+function confirmOptionAndRun()
+{
+	var sel = document.getElementById('selectOpt');
+	selOpt = optSta.value.options[sel.value];
+	progressGo();
+}
+document.getElementById('confirmSelect').onclick = confirmOptionAndRun;
 </script>
 </body>
 </html>
