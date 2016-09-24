@@ -13,8 +13,8 @@ function toggleObjectDiv()
 function valueString(a)
 {
 	// convert value into short string
-	if(a == null)return 'null';
-	if(a == undefined)return 'undefined';
+	if(a === null)return 'null';
+	if(a === undefined)return 'undefined';
 	if(typeof a != 'object')return a.toString();
 	if(a instanceof String || a instanceof Number)return a.toString();
 	if(a instanceof Array)return 'Array[' + a.length + ']';
