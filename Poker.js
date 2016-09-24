@@ -17,12 +17,12 @@ Object.assign(game, {
 	initDeck : cards,
 	poolDeck : Object.defineProperties(
 		new Deck(), {
-			'canSee': {value: new Set()},
+			'defaultCanSee': {value: new Set()},
 			'showPart': {value: 'top'},
 		}),
 	outDeck : Object.defineProperties(
 		new Deck(), {
-			'canSee': {value: new Set()},
+			'defaultCanSee': {value: new Set()},
 			'showPart': {value: 'main top'},
 		}),
 	currentPlayer : null,
@@ -34,7 +34,7 @@ game.players.forEach(function(p,i){
 		seq : (i+1),
 		handDeck : Object.defineProperties(
 			new Deck(), {
-				'canSee': {value: new Set([p])},
+				'defaultCanSee': {value: new Set([p])},
 				'showPart': {value: 'all'},
 			}),
 		score : 0,

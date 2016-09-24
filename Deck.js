@@ -15,7 +15,7 @@
 		{
 			// change the item.canSee as the Deck.canSee
 			item.canSee.clear();
-			this.canSee.forEach(item.canSee.add.bind(item.canSee));
+			this.defaultCanSee.forEach(item.canSee.add.bind(item.canSee));
 		}
 		originalAdd(item);
 		return this;
@@ -53,7 +53,7 @@
 			return new Array(this.cards.length).fill(0).map((d,i)=>i).shuffle().slice(n).map((v)=>this.cards[v]);
 		}
 	};
-	this.canSee = new Set();
+	this.defaultCanSee = new Set();
 	this.showPart = 'all'; // will whole deck shown or the top one only. 'all'|'top'|'bottom'
 	/*
 	this.add = function(newCard)
