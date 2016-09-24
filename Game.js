@@ -6,6 +6,15 @@ function Game()
 		for(i=0;i<number;i++) this.players.push(new Player());
 		return this;
 	}
+	this.inViewOf = function(player)
+	{
+		var view = {};
+		if(player in players)
+		{
+			
+		}
+		return view;
+	}
 	return this;
 }
 
