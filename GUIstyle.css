@@ -1,0 +1,66 @@
+.topScreen.guiScreen {
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+	justify-content: center;
+}
+
+.deck {
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+	justify-content: center;
+	align-items: center;
+	width: 100%;
+	
+	height: 25%;
+}
+
+.card {
+	width: 10%;
+	min-width: 20px;
+	max-width: 100px;
+	height: 80%;
+}
+
+.card img {
+	height: 100%;
+}
+.deck.top {
+	width: 20%;
+}
+.deck.poolDeck {
+	order: 50;
+}
+.deck.top img {
+	border-bottom-style: solid;
+	border-bottom-width: 5px;
+	border-bottom-color: gray;
+}
+.deck.main.top img {
+	border-bottom-style: none;
+}
+.deck.outDeck {
+	width: 50%;
+	order: 51;
+	background: turquoise;
+	cursor: grab;
+	cursor: -webkit-grab;
+}
+.deck.outDeck .card {
+	min-width: 0px;
+	width: 0px;
+}
+.deck.outDeck:hover .card {
+	width: 1.6%;
+	max-width: 100px;
+}
+.deck.outDeck:hover .card:hover {
+	width: 10%;
+}
+.view0 {
+	order: 99;
+}
+.view1 {
+	order: 1;
+}
