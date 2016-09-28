@@ -6,7 +6,7 @@ function Game()
 		for(i=0;i<number;i++) this.players.push(new Player());
 		return this;
 	}
-	this.skipFieldWhenView = new Set(['parent','coverable','rank','canSee','defaultCanSee','skipFieldWhenView']);
+	this.skipFieldWhenView = new Set(['parent','coverable','canSee','defaultCanSee','skipFieldWhenView']);
 	this.inViewOf = function(player)
 	{
 		var view = {inViewOf: player.index};
