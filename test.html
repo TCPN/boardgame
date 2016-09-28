@@ -3,6 +3,7 @@
 <head>
 	<title>Test</title>
 	<link href="style.css" rel="stylesheet" type="text/css">
+	<link href="GUIstyle.css" rel="stylesheet" type="text/css">
 	<style></style>
 </head>
 <body>
@@ -51,11 +52,11 @@ function progressGo()
 {
 	//console.log(optSta = progress.next(selOpt));
 	optSta = progress.next(selOpt);
-	// show game
+	// type game
 	document.getElementById('gameStatusDisplay').previousElementSibling.onclick=toggleObjectDiv;
 	printGame = ObjectDisplayer(game,document.getElementById('gameStatusDisplay'),['parent','cards','coverable','rank']);
 	printGame.next();
-	// show ending message
+	// type ending message
 	if(optSta.done)
 	{
 		document.getElementById('playerDisplay').style.display='none';
@@ -66,13 +67,14 @@ function progressGo()
 			', Winner: Player '+optSta.value.winner.seq + ', (Scores: ' + optSta.value.points.join(':') + ')';
 			return;
 	}
-	// show game progress response
+	// type game progress response
 	document.getElementById('returnedOptionsDisplay').previousElementSibling.onclick=toggleObjectDiv;
 	printOpt = ObjectDisplayer(optSta,document.getElementById('returnedOptionsDisplay'),['parent','cards','coverable','rank']);
 	printOpt.next();
-	// show options and message
+	// type messages
 	document.getElementById('messageDisplay').innerHTML = optSta.value.message;
 	document.getElementById('playerDisplay').innerHTML = 'Player ' + optSta.value.choosers[0].seq;
+	// display options
 	var sel = document.getElementById('selectOpt');
 	sel.innerHTML = '';
 	for(var i=0; i < optSta.value.options.length; i ++)
@@ -82,6 +84,9 @@ function progressGo()
 		newOpt.value = i;
 		sel.add(newOpt);
 	}
+	// display GUI
+	GUIDisplay(game.inViewOf(game.players[0]), document.getElementById('gui_1'));
+	GUIDisplay(game.inViewOf(game.players[1]), document.getElementById('gui_2'));
 }
 function confirmOptionAndRun()
 {
