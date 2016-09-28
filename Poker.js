@@ -5,7 +5,7 @@ for(let s=0;s<4;s++)
 	for(let r=0;r<13;r++)
 	{
 		let newcard = new Card({point: r+1, rank: ranks[r], suit: suits[s]});
-		newcard.toString = function PokerCardStringify(){	return this.suit + ' ' + this.point; };
+		newcard.toString = function PokerCardStringify(){	return this.suit + '_' + this.rank; };
 		cards.push(newcard);
 	}
 
@@ -32,7 +32,7 @@ Object.assign(game, {
 });
 game.players.forEach(function(p,i){
 	Object.assign(p, {
-		seq : (i+1),
+		index : i,
 		handDeck : Object.defineProperties(
 			new Deck(), {
 				'defaultCanSee': {value: new Set([p])},

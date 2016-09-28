@@ -9,7 +9,7 @@ function Game()
 	this.skipFieldWhenView = new Set(['parent','coverable','rank','canSee','defaultCanSee','skipFieldWhenView']);
 	this.inViewOf = function(player)
 	{
-		var view = {};
+		var view = {inViewOf: player.index};
 		if(this.players.indexOf(player) > -1)
 		{
 			var fieldQueue = [{src: this, dst: view}];

@@ -8,7 +8,6 @@
 </head>
 <body>
 <div class="topScreen guiScreen" id='gui_1'>
-<image style="background: url(); height: 25%;">
 </div>
 <div class="topScreen guiScreen" id='gui_2'>
 </div>
@@ -64,7 +63,7 @@ function progressGo()
 		document.getElementById('confirmSelect').style.display='none';
 		document.getElementById('returnedOptionsDisplay').style.display='none';
 		document.getElementById('messageDisplay').innerHTML = optSta.value.message +
-			', Winner: Player '+optSta.value.winner.seq + ', (Scores: ' + optSta.value.points.join(':') + ')';
+			', Winner: Player '+(optSta.value.winner.index+1) + ', (Scores: ' + optSta.value.points.join(':') + ')';
 			return;
 	}
 	// type game progress response
@@ -73,7 +72,7 @@ function progressGo()
 	printOpt.next();
 	// type messages
 	document.getElementById('messageDisplay').innerHTML = optSta.value.message;
-	document.getElementById('playerDisplay').innerHTML = 'Player ' + optSta.value.choosers[0].seq;
+	document.getElementById('playerDisplay').innerHTML = 'Player ' + (optSta.value.choosers[0].index+1);
 	// display options
 	var sel = document.getElementById('selectOpt');
 	sel.innerHTML = '';
