@@ -68,3 +68,11 @@
 .view1 {
 	order: 1;
 }
+
+.option {
+	outline-style: solid;
+	outline-color: lightgray;
+}
+.option:hover {
+	outline-color: yellow;
+}
