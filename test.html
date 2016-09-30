@@ -40,21 +40,27 @@
 <script language="javascript" defer>
 // debugger;
 
-var progress = gameProgress();
+var pokerGame = new PokerGame();
 var optSta;
 var selOpt;
 var printOpt;
 var printGame;
 progressGo();
 
-function progressGo()
+function progressGo(opted)
 {
-	//console.log(optSta = progress.next(selOpt));
-	optSta = progress.next(selOpt);
+	//console.log(optSta = progress.next(opted));
+	optSta = pokerGame.run(opted);
 	// type game
 	document.getElementById('gameStatusDisplay').previousElementSibling.onclick=toggleObjectDiv;
-	printGame = ObjectDisplayer(game,document.getElementById('gameStatusDisplay'),['parent','cards','coverable','rank']);
+	printGame = ObjectDisplayer(pokerGame,document.getElementById('gameStatusDisplay'),['parent','cards','coverable','rank']);
 	printGame.next();
+	try
+	{
+		// display GUI
+		GUIDisplay(pokerGame.inViewOf(pokerGame.players[0]), document.getElementById('gui_1'));
+		GUIDisplay(pokerGame.inViewOf(pokerGame.players[1]), document.getElementById('gui_2'));
+	}catch(e){console.log(e)};
 	// type ending message
 	if(optSta.done)
 	{
@@ -62,8 +68,8 @@ function progressGo()
 		document.getElementById('selectOpt').style.display='none';
 		document.getElementById('confirmSelect').style.display='none';
 		document.getElementById('returnedOptionsDisplay').style.display='none';
-		document.getElementById('messageDisplay').innerHTML = optSta.value.message +
-			', Winner: Player '+(optSta.value.winner.index+1) + ', (Scores: ' + optSta.value.points.join(':') + ')';
+		document.getElementById('messageDisplay').innerHTML = pokerGame.message +
+			', Winner: Player '+(pokerGame.winner.index+1) + ', (Scores: ' + pokerGame.scores.join(':') + ')';
 			return;
 	}
 	// type game progress response
@@ -71,28 +77,34 @@ function progressGo()
 	printOpt = ObjectDisplayer(optSta,document.getElementById('returnedOptionsDisplay'),['parent','cards','coverable','rank']);
 	printOpt.next();
 	// type messages
-	document.getElementById('messageDisplay').innerHTML = optSta.value.message;
-	document.getElementById('playerDisplay').innerHTML = 'Player ' + (optSta.value.choosers[0].index+1);
+	document.getElementById('messageDisplay').innerHTML = pokerGame.message;
+	document.getElementById('playerDisplay').innerHTML = 'Player ' + (pokerGame.currentPlayer.index+1);
 	// display options
 	var sel = document.getElementById('selectOpt');
 	sel.innerHTML = '';
-	for(var i=0; i < optSta.value.options.length; i ++)
+	for(var i = 0; i < pokerGame.waitFor.length; i ++)
 	{
-		let newOpt = document.createElement('option');
-		newOpt.innerHTML = optSta.value.options[i].toString();
-		newOpt.value = i;
-		sel.add(newOpt);
+		for(var j = 0; j < pokerGame.waitFor[i].actions.length; j ++)
+		{		
+			let newOpt = document.createElement('option');
+			newOpt.innerHTML = pokerGame.waitFor[i].actions[j].toString();
+			newOpt.value = '' + i + ',' + j;
+			sel.add(newOpt);
+		}
 	}
-	// display GUI
-	GUIDisplay(game.inViewOf(game.players[0]), document.getElementById('gui_1'));
-	GUIDisplay(game.inViewOf(game.players[1]), document.getElementById('gui_2'));
 }
 function confirmOptionAndRun()
 {
 	var sel = document.getElementById('selectOpt');
-	selOpt = optSta.value.options[sel.value];
-	progressGo();
+	var pIndex = sel.value.split(',')[0];
+	var c = sel.value.split(',')[1];
+	selOpt = {
+		actor: pokerGame.players[pIndex], 
+		action: pokerGame.waitFor.find((v)=>v.actor.index==pIndex).actions[c]
+	};
+	progressGo(selOpt);
 }
+
 document.getElementById('confirmSelect').onclick = confirmOptionAndRun;
 </script>
 </body>

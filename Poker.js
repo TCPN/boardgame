@@ -1,134 +1,147 @@
-var cards = [];
-var ranks = ['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
-var suits = ['Spade', 'Heart', 'Club', 'Diamond'];
-for(let s=0;s<4;s++)
-	for(let r=0;r<13;r++)
+function PokerGame()
+{
+	var cards = [];
+	var ranks = ['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
+	var suits = ['Spade', 'Heart', 'Club', 'Diamond'];
+	function PokerCardStringify(){	return this.suit + '_' + this.rank; }
+	for(let s=0;s<4;s++)
+		for(let r=0;r<13;r++)
+		{
+			let newcard = new Card({point: r+1, rank: ranks[r], suit: suits[s]});
+			newcard.toString = PokerCardStringify;
+			cards.push(newcard);
+		}
+
+
+		
+		
+	var thisGame = Game.apply(this).setPlayerNumber(2);
+	thisGame.skipFieldWhenView.add('initDeck');
+	Object.assign(thisGame, {
+		initDeck : cards,
+		poolDeck : Object.defineProperties(
+			new Deck(), {
+				'defaultCanSee': {value: new Set()},
+				'showPart': {value: 'top'},
+			}),
+		outDeck : Object.defineProperties(
+			new Deck(), {
+				'defaultCanSee': {value: new Set(['all'])},
+				'showPart': {value: 'main top'},
+			}),
+		currentPlayer : null,
+		conPass : 0,
+		isEnd : false,
+	});
+	thisGame.players.forEach(function(p,i){
+		Object.assign(p, {
+			index : i,
+			handDeck : Object.defineProperties(
+				new Deck(), {
+					'defaultCanSee': {value: new Set([p])},
+					'showPart': {value: 'all'},
+				}),
+			score : 0,
+		});
+	});
+
+	function waitForActions(message, actions, timelimit, defaultOpt)
 	{
-		let newcard = new Card({point: r+1, rank: ranks[r], suit: suits[s]});
-		newcard.toString = function PokerCardStringify(){	return this.suit + '_' + this.rank; };
-		cards.push(newcard);
+		timelimit = timelimit || Infinity;
+		thisGame.status = "waitForUserAction";
+		thisGame.message = message;
+		thisGame.waitFor = actions;
+		return thisGame.waitFor;
 	}
 
-
-	
-	
-game = new Game().setPlayerNumber(2);
-game.skipFieldWhenView.add('initDeck');
-Object.assign(game, {
-	initDeck : cards,
-	poolDeck : Object.defineProperties(
-		new Deck(), {
-			'defaultCanSee': {value: new Set()},
-			'showPart': {value: 'top'},
-		}),
-	outDeck : Object.defineProperties(
-		new Deck(), {
-			'defaultCanSee': {value: new Set(['all'])},
-			'showPart': {value: 'main top'},
-		}),
-	currentPlayer : null,
-	conPass : 0,
-	isEnd : false,
-});
-game.players.forEach(function(p,i){
-	Object.assign(p, {
-		index : i,
-		handDeck : Object.defineProperties(
-			new Deck(), {
-				'defaultCanSee': {value: new Set([p])},
-				'showPart': {value: 'all'},
-			}),
-		score : 0,
-	});
-})
-
-function AUserChoice(message, players, options, timelimit, defaultOpt)
-{
-	timelimit = timelimit || 60;
-	return {
-		"message" : message,
-		"choosers": players,
-		"options" : options,
-		"timelimit" : timelimit,
-		"default" : defaultOpt,
-	};
-}
-
-var gameProgress = function* ()
-{
-	Game.move(game.initDeck, game.poolDeck);
-	game.poolDeck.shuffle();
-	for(let p of game.players)
-		Game.move(game.poolDeck.topCard(5), p.handDeck);
-	Game.move(game.poolDeck.topCard(1), game.outDeck)
-	game.currentPlayer = game.players[0];
-	
-	var outCardVerify = function outCardVerify(choice)
+	var gameProgress = function* ()
 	{
-		if(choice == "pass")
-			return {isLegal: true};
-		else
+		Game.move(thisGame.initDeck, thisGame.poolDeck);
+		thisGame.poolDeck.shuffle();
+		for(let p of thisGame.players)
+			Game.move(thisGame.poolDeck.topCard(5), p.handDeck);
+		Game.move(thisGame.poolDeck.topCard(1), thisGame.outDeck)
+		thisGame.currentPlayer = thisGame.players[0];
+		
+		var outCardVerify = function outCardVerify(player, choice)
 		{
-			let lastPoint = game.outDeck.bottomCard(1).point;
-			var passPoint = [lastPoint-3, lastPoint, lastPoint+1, lastPoint+2, lastPoint+3].map((v)=>((v+12)%13+1));
-			if(choice.suit == game.outDeck.bottomCard(1).suit && choice.point == passPoint[0])
-				return {isLegal: false, message: 'No down when same suit'};
-			else if(passPoint.indexOf(choice.point) > -1)
+			if(player != thisGame.currentPlayer)
+				return {isLegal: false, message: 'Not the current player'};
+			if(choice == thisGame.poolDeck) //pass
 				return {isLegal: true};
 			else
-				return {isLegal: false, message: 'Invalid point'};
-		}
-	}
-	
-	while(true)
-	{
-		var msg = "CurrentPlayerPlay";
-		while(1)
-		{
-			//var choice = yield AUserChoice(new Set([game.currentPlayer]), new Set(game.currentPlayer.handDeck.cards).add("pass"));
-			var choice = yield AUserChoice(
-				msg,
-				[].concat(game.currentPlayer),
-				[].concat(game.currentPlayer.handDeck.cards).concat("pass").filter((v)=>outCardVerify(v).isLegal)
-				);
-			msg = "CurrentPlayerPlayed";
-			//verify
-			var res = outCardVerify(choice);
-			if(res.isLegal)
-				break;
-			else
 			{
-				msg = msg + ', but ' + res.message;
-				continue;
+				let lastPoint = thisGame.outDeck.bottomCard(1).point;
+				var legalPoint = [lastPoint-3, lastPoint, lastPoint+1, lastPoint+2, lastPoint+3].map((v)=>((v+12)%13+1));
+				if(choice.suit == thisGame.outDeck.bottomCard(1).suit && choice.point == legalPoint[0])
+					return {isLegal: false, message: 'No down when same suit'};
+				else if(legalPoint.indexOf(choice.point) > -1)
+					return {isLegal: true};
+				else
+					return {isLegal: false, message: 'Invalid point'};
 			}
 		}
-		if(choice != "pass")
+		
+		while(true)
 		{
-			game.conPass = 0;
-			Game.move(choice, game.outDeck);
-			if(game.currentPlayer.handDeck.length == 0)
-				break;
+			var msg = "CurrentPlayerPlay";
+			while(1)
+			{
+				//var choice = yield AUserChoice(new Set([thisGame.currentPlayer]), new Set(thisGame.currentPlayer.handDeck.cards).add(thisGame.poolDeck));
+				var choiceResponse = yield waitForActions(
+					msg,
+					[{
+						actor: thisGame.currentPlayer,
+						actions: thisGame.currentPlayer.handDeck.cards
+								.concat(thisGame.poolDeck)
+								.filter((v)=>outCardVerify(thisGame.currentPlayer,v).isLegal)
+					}]
+					);
+				msg = "CurrentPlayerPlayed";
+				//verify
+				var choice = choiceResponse.action;
+				var res = outCardVerify(choiceResponse.actor, choice);
+				if(res.isLegal)
+					break;
+				else
+				{
+					msg = msg + ', but ' + res.message;
+					continue;
+				}
+			}
+			if(choice != thisGame.poolDeck)
+			{
+				thisGame.conPass = 0;
+				Game.move(choice, thisGame.outDeck);
+				if(thisGame.currentPlayer.handDeck.length == 0)
+					break;
+			}
+			else
+			{
+				if(thisGame.poolDeck.length != 0)
+					Game.move(thisGame.poolDeck.topCard(1), thisGame.currentPlayer.handDeck);
+				thisGame.conPass += 1;
+				if(thisGame.poolDeck.length == 0 && thisGame.conPass == 2)
+					break;
+			}
+			thisGame.currentPlayer = thisGame.players[(thisGame.players.indexOf(thisGame.currentPlayer)+1)%thisGame.players.length];
 		}
-		else
-		{
-			if(game.poolDeck.length != 0)
-				Game.move(game.poolDeck.topCard(1), game.currentPlayer.handDeck);
-			game.conPass += 1;
-			if(game.poolDeck.length == 0 && game.conPass == 2)
-				break;
-		}
-		game.currentPlayer = game.players[(game.players.indexOf(game.currentPlayer)+1)%game.players.length];
-	}
-	game.players.forEach(function(p){
-		let s = 0;
-		for(c of p.handDeck.cards)
-			s += c.point;
-		p.point = s;
-	});
-	return {
-		message: 'GameEnd',
-		points: game.players.map((p)=>p.handDeck.length),
-		winner: game.players.reduce((bp,cp)=>(cp.point < bp.point ? cp : bp),game.currentPlayer),
+		thisGame.players.forEach(function(p){
+			let s = 0;
+			for(c of p.handDeck.cards)
+				s += c.point;
+			p.point = s;
+		});
+		thisGame.scores = thisGame.players.map((p)=>p.handDeck.length);
+		thisGame.winner = thisGame.players.reduce((bp,cp)=>(cp.point < bp.point ? cp : bp),thisGame.currentPlayer);
+		return waitForActions('GameEnd', []);
 	};
+	
+	 var runningProgress = null;
+	 this.run = function(input)
+	 {
+		if(runningProgress == undefined)
+			runningProgress = gameProgress();
+		return runningProgress.next(input);
+	 };
 }
-
