@@ -4,8 +4,9 @@ body {
 }
 
 .topScreen {
-	flex: 1;
+	/*flex: 1;*/
 	border-style: inset;
+	display: none;
 }
 
 .field {
@@ -24,7 +25,10 @@ body {
 }
 
 .guiScreen {
+	width: 800px;
+	height: 600px;
 	min-width: 400px;
-	max-width: 800px;
-	height: 300px;
+	max-width: 1024px;
+	min-height: 300px;
+	max-height: 768px;
 }
