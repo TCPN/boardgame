@@ -1,4 +1,19 @@
-﻿function Deck()
+if(require != undefined)
+{
+	ArrayExt = require('./ArrayExt').ArrayExt;
+	MathExt = require('./MathExt').MathExt;
+	ObjectExt = require('./ObjectExt').ObjectExt;
+	Position = require('./Position').Position;
+	// Card = require('./Card').Card;
+	// Deck = require('./Deck').Deck;
+	// Dice = require('./Dice').Dice;
+	// Player = require('./Player').Player;
+	// Token = require('./Token').Token;
+	// Game = require('./Game').Game;
+}
+if(exports != undefined) exports.Deck = Deck;
+
+function Deck()
 {
 	Position.apply(this);
 	Object.defineProperties(this,{

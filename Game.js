@@ -1,3 +1,18 @@
+if(require != undefined)
+{
+	ArrayExt = require('./ArrayExt').ArrayExt;
+	MathExt = require('./MathExt').MathExt;
+	ObjectExt = require('./ObjectExt').ObjectExt;
+	Card = require('./Card').Card;
+	Deck = require('./Deck').Deck;
+	Dice = require('./Dice').Dice;
+	Player = require('./Player').Player;
+	Position = require('./Position').Position;
+	Token = require('./Token').Token;
+	//Game = require('./Game').Game;
+}
+if(exports != undefined) exports.Game = Game;
+
 function Game()
 {
 	this.players = [];
@@ -8,7 +23,7 @@ function Game()
 	}
 	this.skipFieldWhenView = new Set(
 		['parent','coverable','canSee','waitFor','status',
-		'defaultCanSee','skipFieldWhenView']);
+		'defaultCanSee','skipFieldWhenView', 'user']);
 	this.inViewOf = function(player)
 	{
 		var optable = [];
@@ -36,6 +51,10 @@ function Game()
 							continue;
 						if(destObj.type == 'Deck' && k == 'items') // deck.items == deck.cards, keep only one of them
 							continue;
+						if(k == 'winner' && sourceObj[k] != undefined) // deck.items == deck.cards, keep only one of them
+						{
+							destObj['myVictory'] = (sourceObj[k] == player);
+						}
 						switch(typeof sourceObj[k])
 						{
 							case 'function':
