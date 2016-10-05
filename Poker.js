@@ -1,4 +1,18 @@
-function PokerGame()
+if(require != undefined)
+{
+	ArrayExt = require('./ArrayExt').ArrayExt;
+	MathExt = require('./MathExt').MathExt;
+	ObjectExt = require('./ObjectExt').ObjectExt;
+	Card = require('./Card').Card;
+	Deck = require('./Deck').Deck;
+	Dice = require('./Dice').Dice;
+	Player = require('./Player').Player;
+	Position = require('./Position').Position;
+	Token = require('./Token').Token;
+	Game = require('./Game').Game;
+}
+
+function PokerGame(users)
 {
 	var cards = [];
 	var ranks = ['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
@@ -14,8 +28,9 @@ function PokerGame()
 
 
 		
-		
 	var thisGame = Game.apply(this).setPlayerNumber(2);
+	// assume users is Array
+	if(users != undefined) users.forEach(function(u,i){u.player = thisGame.players[i];u.player.user=u;});
 	thisGame.skipFieldWhenView.add('initDeck');
 	Object.assign(thisGame, {
 		initDeck : cards,
@@ -142,6 +157,21 @@ function PokerGame()
 	 {
 		if(runningProgress == undefined)
 			runningProgress = gameProgress();
-		return runningProgress.next(input);
+		var wa = runningProgress.next(input);
+		if(thisGame.status == "waitForUserAction")
+		{
+			console.log("waitForUserAction");
+			try{
+				thisGame.players.forEach(function(p){
+					p.user.takeGameMessage(thisGame.inViewOf(p));
+				});
+			}catch(e)
+			{
+				console.log(e);
+			}
+		}
+		return wa;
 	 };
 }
+
+if(exports != undefined) exports.PokerGame = PokerGame;
