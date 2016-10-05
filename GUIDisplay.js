@@ -1,4 +1,4 @@
-function GUIDisplay(game, screen)
+function GUIDisplay(game, screen, handlers)
 {
 	function display(item, name){
 		if(item.constructor == Object)
@@ -12,6 +12,28 @@ function GUIDisplay(game, screen)
 			else if(item.type == 'Position')
 				;
 		}
+	};
+	function displayMessage(message, kind, keepTime){
+		var msgDOM = screen.getElementsByClassName('message')[0];
+		function hideMessageDOM(){msgDOM.classList.add('hidden')};
+		function showMessageDOM(){msgDOM.classList.remove('hidden')};
+		if(msgDOM == undefined)
+		{
+			msgDOM = screen.insertBefore(document.createElement('div'),null);
+			msgDOM.classList.add('message','hidden');
+			/*
+			msgDOM.addEventListener('transitioned', function(){
+				if(!msgDOM.classList.contains('hidden') && !msgDOM.classList.contains('noAutoHide'))
+					setTimeout(hideMessageDOM, msgDOM.keepTime);
+			}, true);*/
+			msgDOM.addEventListener('click', hideMessageDOM);
+			setTimeout(function(){displayMessage(message, kind, keepTime)}, 1);// run like this, so the message animation will played.
+			return;
+		}
+		msgDOM.innerHTML = message;
+		msgDOM.keepTime = keepTime * 1000;
+		showMessageDOM();
+		setTimeout(hideMessageDOM, keepTime * 1000);
 	};
 	function updateOptable(obj, objDOM)
 	{
@@ -89,23 +111,25 @@ function GUIDisplay(game, screen)
 		var t = dom.optionIndex
 		var p = dom.playerIndex;
 		return {
-		actor: pokerGame.players[p], 
-		action: pokerGame.waitFor.find((v)=>v.actor.index==p).actions[t]
-	};
+			actor: p,
+			action: t,
+		};
 	}
 	function objectClick()
 	{
 		if(this.classList.contains('option'))
 		{
-			progressGo(optObjectOfThisDOM(this));
+			handlers.gameAction(optObjectOfThisDOM(this));
 		}
-		console.log(this);
+		//console.log(this);
 	}
 	
 	for(var k in game)
 	{
 		if(game[k] == undefined)
 			continue;
+		if(k == 'message' && game[k] == 'GameEnd')
+			displayMessage((game.myVictory ? 'YOU WIN!' : 'You Lose.'), 'regular', 5);
 		if(k == 'players') // assume 'players' contains all players, assume it's Array
 		{
 			var p = game.inViewOf;
