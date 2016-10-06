@@ -108,7 +108,7 @@ function PokerGame(users)
 					[{
 						actor: thisGame.currentPlayer,
 						actions: thisGame.currentPlayer.handDeck.cards
-								.concat(thisGame.poolDeck)
+								.concat(thisGame.poolDeck.length > 0 ? thisGame.poolDeck : [] )
 								.filter((v)=>outCardVerify(thisGame.currentPlayer,v).isLegal)
 					}]
 					);
