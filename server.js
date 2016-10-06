@@ -5,9 +5,12 @@ var fs = require("fs");
 var url = require("url");
 var createUser = require("./WaitForGame").createUser;
 
+var port = 80;
+if(process.argv.length >= 3)
+	port = parseInt(process.argv[2]);
 if(process.env.OPENSHIFT_NODEJS_PORT == null)
 {
-	server.listen(80);
+	server.listen(port);
 }
 else
 {
