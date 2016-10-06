@@ -25,6 +25,8 @@
 }
 .card:last-child {
 	min-width: auto;
+	/* for safari*/
+	min-width: -webkit-max-content;
 }
 .card img {
 	height: 100%;
@@ -63,6 +65,8 @@
 	min-width: auto;
 	width: auto;
 	max-width: 100%;
+	/* for safari*/
+	min-width: -webkit-max-content;
 }
 .view0 {
 	order: 99;
@@ -96,7 +100,10 @@
 	align-items: center;
 	transition-property: top;
 	transition-duration: 1s;
-	transition-timing-function: ease-out;
+	transition-timing-function: ease-out;i
+	/* for safari , make it align center */
+	margin-left: 30%;
+	margin-right: 30%;
 }
 .message.hidden {
 	top: -50px;

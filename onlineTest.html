@@ -89,7 +89,7 @@ function confirmOptionAndRun()
 	var c = sel.value.split(',')[1];
 	selOpt = {
 		actor: pokerGame.players[pIndex], 
-		action: pokerGame.waitFor.find((v)=>v.actor.index==pIndex).actions[c]
+		action: pokerGame.waitFor.find(function(v){return v.actor.index==pIndex}).actions[c],
 	};
 	progressGo(selOpt);
 }

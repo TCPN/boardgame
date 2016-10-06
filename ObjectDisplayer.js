@@ -21,7 +21,7 @@ function valueString(a)
 	if(a.toString && a.toString != Object.prototype.toString)return a.toString();
 	return a.constructor.name;
 }
-function* ObjectDisplayer(obj, target, skipField)
+function ObjectDisplayer(obj, target, skipField)
 {
 	// capture the DOM to show
 	target = target || document.getElementById('ObjectDisplay');
@@ -46,11 +46,11 @@ function* ObjectDisplayer(obj, target, skipField)
 		targetDOM.innerHTML = '';
 		// close too big object in the first
 		if(Object.keys(targetObj)
-			.filter((k)=>(skipField.indexOf(k)<0)&&(typeof targetObj[k]!='function'))
+			.filter(function(k){return (skipField.indexOf(k)<0)&&(typeof targetObj[k]!='function');})
 			.length > 15 )
 			targetDOM.previousElementSibling.classList.add('closed');
 		// for all keys in the object
-		for(let k in targetObj)
+		for(var k in targetObj)
 		{
 			// not showing if the field is a function
 			if(typeof targetObj[k] == 'function')
@@ -83,15 +83,16 @@ function* ObjectDisplayer(obj, target, skipField)
 		{
 			// this tree is too large.
 			// alert('displayObj paused.');
-			let pausedMark = target.insertBefore(document.createElement('span'),null);
+			var pausedMark = target.insertBefore(document.createElement('span'),null);
 			pausedMark.innerHTML = 'PAUSED';
 			pausedMark.style.color = 'white';
 			pausedMark.style.background = 'red';
-			yield propertyCount;
+			// not use for some browser cannot
+			//yield propertyCount;
 			pausedMark.remove();
 		}
 	}
-	let doneMark = target.insertBefore(document.createElement('span'),null);
+	var doneMark = target.insertBefore(document.createElement('span'),null);
 	doneMark.innerHTML = 'DONE';
 	doneMark.style.color = 'white';
 	doneMark.style.background = 'blue';

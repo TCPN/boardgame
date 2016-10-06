@@ -65,10 +65,13 @@ function GUIDisplay(game, screen, handlers)
 		var numChange = deck.length - oldCardDOMs.length;
 		var newArrange = [];
 		var initCi = 0, endCi = deck.length;
-		if(deck.showPart == 'top')
+		if(deck.length <= 0)
+			endCi = 0;
+		else if(deck.showPart == 'top')
 			endCi = 1;
 		else if(deck.showPart == 'bottom')
 			initCi = deck.length - 1;
+		
 		for(var ci = initCi; ci < endCi; ci ++)
 		{
 			var cardName = guiCardName(deck.cards[ci]);
@@ -77,9 +80,9 @@ function GUIDisplay(game, screen, handlers)
 			newArrange[ci] = cardDOM;
 		}
 		// remove no-use card DOMs
-		oldCardDOMs.forEach((c)=>c.remove());
+		oldCardDOMs.forEach(function(c){c.remove();});
 		// insert card DOMs according to  newArrange
-		newArrange.forEach((c)=>deckDOM.insertBefore(c,null));
+		newArrange.forEach(function(c){deckDOM.insertBefore(c,null);});
 		return deckDOM;
 	}
 
@@ -91,7 +94,7 @@ function GUIDisplay(game, screen, handlers)
 	function getCardDOM(deckDOM, card, oldCardDOMs)
 	{
 		var cardName = guiCardName(card);
-		var cardDOM = oldCardDOMs.find((v)=>v.classList.contains(cardName))
+		var cardDOM = oldCardDOMs.find(function(v){return v.classList.contains(cardName);});
 		if(cardDOM == undefined)
 		{
 			cardDOM = deckDOM.insertBefore(document.createElement('div'),null);
