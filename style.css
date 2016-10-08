@@ -1,6 +1,13 @@
+html {
+	/*height: 100%;*/
+}
+
 body {
-  display: flex;
-  flex-flow: row wrap; 
+	/*display: flex;*/
+	/*flex-flow: row wrap; */
+	/*height: 100% !important;
+	width: 100% !important;
+	overflow: visible !important;*/
 }
 
 .topScreen {
@@ -8,7 +15,24 @@ body {
 	border-style: inset;
 	display: none;
 }
-
+.mainFrame {
+	height: 100vh;
+	width: 100vw;
+	display: flex;
+	flex-direction: column;
+	position: absolute;
+	top: 0;
+	left: 0;
+}
+@media (orientation: landscape) {
+	.mainFrame {
+		flex-direction: row;
+	}
+}
+.toolbar {
+	min-height: 40px;
+	background: black;
+}
 .field {
 	padding-left: 10px;
 }
@@ -25,10 +49,30 @@ body {
 }
 
 .guiScreen {
-	width: 800px;
+	/*width: 800px;
 	height: 600px;
-	min-width: 400px;
-	max-width: 1024px;
-	min-height: 300px;
-	max-height: 768px;
+	min-width: 0;
+	min-height: 0;*/
+	border-style: inset;
+	flex-grow: 1;
+}
+@media (orientation: landscape) {
+	.guiScreen {
+		width: calc(100vw - 80px);
+	}
+}
+@media (orientation: portrait) {
+	.guiScreen {
+		height: calc(100vw - 47px);
+	}
+}
+.nameField {
+	font-weight: bold;
+}
+.inputButtonSet {
+	display: flex;
+	align-items: center;
+}
+.inputButtonSet .button{
+	flex-shrink: 0;
 }
