@@ -4,6 +4,7 @@ var io = require("socket.io")(server);
 var fs = require("fs");
 var url = require("url");
 var createUser = require("./WaitForGame").createUser;
+var route = require("./route");
 
 var port = 80;
 if(process.argv.length >= 3)
@@ -15,36 +16,6 @@ if(process.env.OPENSHIFT_NODEJS_PORT == null)
 else
 {
 	server.listen(process.env.OPENSHIFT_NODEJS_PORT, process.env.OPENSHIFT_NODEJS_IP);
-}
-
-route = function(pathname){
-	var hardRoute = {
-		"/play" 				: "/onlineTest.html",
-		"/style.css"			: "/style.css",
-		"/GUIstyle.css"			: "/GUIstyle.css",
-		"/parseURLQuery.js"		: "/parseURLQuery.js",
-		"/GUIDisplay.js"		: "/GUIDisplay.js",
-		"/connectServer.js"		: "/connectServer.js",
-		"/ObjectDisplayer.js"	: "/ObjectDisplayer.js",
-		
-		"/favicon.ico" 			: "/resistance icon.png",
-		"/socket.io.test" 		: "/socketiotest.html",
-		"/uitest" 				: "/UItest.html",
-		"/resistance/rule" 		: "/Rule.html",
-		"/resistance/legend" 	: "/Legend.html",
-		"/resistance/flow" 		: "/flow.png",
-		
-		"/test/LoveLetter" 		: "/LoveLetterCoreTest.html",
-		"/test/LoveLetter.js" 	: "/LoveLetterCore.js",
-		"/test/Coup" 			: "/CoupCoreTest.html",
-		"/test/Coup.js" 		: "/CoupCore.js",
-	};
-	if(pathname in hardRoute)
-		return hardRoute[pathname];
-	else if(pathname.startsWith('/pic/') && !pathname.endsWith('/'))
-		return pathname;
-	else if(pathname.endsWith('Ext.js'))
-		return pathname;
 }
 
 function handler (req, res) {
