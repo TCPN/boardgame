@@ -27,10 +27,15 @@ function Game()
 	this.inViewOf = function(player)
 	{
 		var optable = [];
-		for(let i = 0; i < this.waitFor.length; i ++)
+		if(this.status != "GameEnd")
 		{
-			if(this.waitFor[i].actor == player)
-				optable = this.waitFor[i].actions;
+			//console.log('give options');
+			for(let i = 0; i < this.waitFor.length; i ++)
+			{
+				// for now, only one action set will be properly set by these codes
+				if(this.waitFor[i].actor == player)
+					optable = this.waitFor[i].actions;
+			}
 		}
 		var view = {inViewOf: player.index};
 		if(this.players.indexOf(player) > -1)

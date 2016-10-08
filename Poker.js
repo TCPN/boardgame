@@ -63,7 +63,10 @@ function PokerGame(users)
 	function waitForActions(message, actions, timelimit, defaultOpt)
 	{
 		timelimit = timelimit || Infinity;
-		thisGame.status = "waitForUserAction";
+		if(message == "GameEnd")
+			thisGame.status = message;
+		else
+			thisGame.status = "waitForUserAction";
 		thisGame.message = message;
 		thisGame.waitFor = actions;
 		return thisGame.waitFor;
@@ -158,9 +161,9 @@ function PokerGame(users)
 		if(runningProgress == undefined)
 			runningProgress = gameProgress();
 		var wa = runningProgress.next(input);
-		if(thisGame.status == "waitForUserAction")
+		if(thisGame.status == "waitForUserAction" || thisGame.status == "GameEnd")
 		{
-			console.log("waitForUserAction");
+			console.log(thisGame.status);
 			try{
 				thisGame.players.forEach(function(p){
 					p.user.takeGameMessage(thisGame.inViewOf(p));
