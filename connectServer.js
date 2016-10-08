@@ -1,15 +1,29 @@
 ﻿
 function getRoomIdFromURL()
 {
+	if(location.pathname == '/')
+		return 0;
 	return parseURLQuery().roomId;
 }
 
+function getName()
+{
+	if(document.cookie.includes("username="))
+		return document.cookie.match(/username=([^;]*)/)[1];
+	else
+	{
+		var name = prompt("Your name:");
+		document.cookie = "username="+name;
+		return name
+	}
+}
+
 //assume socket.io is included, and evaluated
-function newUserEnter(name, password)
+function newUserEnter()
 {
 	user={};
-	user.name = name;
-	user.password = password;
+	user.name = getName();
+	user.password = "";
 	user.chatContent = "";
 	user.states = undefined;
 	user.socketTimer = [];
@@ -34,12 +48,18 @@ function newUserEnter(name, password)
 	user.socket.on("checkRoom", function(){
 		user.socket.emit("roomQuery", {roomId: getRoomIdFromURL()});
 	});
-	user.socket.on("roomId", function(data){
+	user.socket.on("roomInfo", function(data){
 		// don't do  this , it refreshes
 		//if(getRoomIdFromURL() != data.roomId)
 		//	location.search = "?roomId=" + data.roomId;
+		if(data.reject)
+		{
+			alert(data.rejectMessage);
+			// go back to game list
+			location.href = location.origin+"/";
+		}
 		console.log("get roomId: "+data.roomId);
-		user.roomId = data.roomId;
+		user.room = {id: data.roomId, name: data.roomName};
 	});
 	user.socket.on("toClient", function(data){
 		user.socketTimer.forEach(clearTimeout);
@@ -89,6 +109,7 @@ function newUserEnter(name, password)
 	});
 	user.socket.on("Error", function(data){
 		alert(data.message);
+		console.log(data);
 	});
 	user.socket.on("error", function(er){
 		console.log(er.message);
@@ -104,4 +125,4 @@ function newUserEnter(name, password)
 	//document.getElementById("UIArea").style.display = "block";
 }
 
-newUserEnter(prompt("your name:"),"");
+newUserEnter();

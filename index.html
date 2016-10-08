@@ -1,0 +1,136 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+	<title>Poker</title>
+	<meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, user-scalable=yes" />
+	<link href="style.css" rel="stylesheet" type="text/css">
+	<link href="GUIstyle.css" rel="stylesheet" type="text/css">
+	<style>
+	body {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		background: url(https://www.unlimitedplay.org/wp-content/uploads/2013/04/Zachary-s-Playground-Pictures-020-2.jpg);
+		background-attachment: fixed;
+		background-repeat: no-repeat;
+		background-size: auto 110%;
+	}
+	@media screen and (min-aspect-ratio: 5/3) {
+		body {
+			background-size: 100% auto;
+		}
+	}
+	div, .gameList * {
+		display: flex;
+		justify-content: center;
+	}
+	.gameList {
+		width: 50%;
+		min-width: 300px;
+		max-width: 400px;
+		min-height: 100px;
+		background: rgba(240,255,255,0.8); /*azure, transparent*/
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		align-items: stretch;
+		padding: 10px;
+	}
+	@media screen and (max-width: 350px) {
+		.gameList {
+			min-width: 95%;
+			max-width: 95%;
+		}
+	}
+	.item a {
+		color: black;
+		text-decoration: none;
+		padding: 5px;
+		width: 100%;
+		height: 100%;
+	}
+	.gameList .item {
+		background: rgba(255,255,255,0.9);
+		margin-bottom: 10px;
+		display: flex;
+		padding: 10px;
+		justify-content: center;
+		align-items: center;
+	}
+	.gameList > .head {
+		font: 2em cursive;
+		margin-bottom: 10px;
+		margin-left: auto;
+		margin-right: auto;
+	}
+	.loadingIcon img{
+		width: 50px;
+		height: 50px;
+		position: relative;
+		margin: 10px;
+	}
+	.loading .loadingIcon{
+		width: 0px;
+		align-self: center;
+	}
+	.loading.finish .loadingIcon, .loading.failed .loadingIcon{
+		display: none;
+	}
+	.loading .failMsg {
+		display: none;
+	}
+	.loading.failed .failMsg {
+		display: flex;
+		background: rgba(128,128,128,0.2);
+		padding: 10px;
+	}
+	</style>
+</head>
+<body>
+<div id="gameList" class="gameList loading">
+<div class="head">Games</div>
+<div class="loadingIcon"><img src="https://www.asus.com/support/images/support-loading.gif"></div>
+<div class="failMsg">Oops!<br>Failed to Load the Game List.</div>
+</div>
+<script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
+<script src="ObjectExt.js"></script>
+<script src="MathExt.js"></script>
+<script src="ArrayExt.js"></script>
+<script src="GUIDisplay.js"></script>
+<script src="ObjectDisplayer.js"></script>
+<script src="parseURLQuery.js"></script>
+<script src="connectServer.js"></script>
+<script language="javascript" defer>
+// debugger;
+var gameListDOM = document.getElementById("gameList");
+function createGameListItem(gameListItem)
+{
+	var dom = document.createElement('div');
+	dom.classList.add('item');
+	dom.innerHTML = '<a>'+gameListItem.name+'</a>';
+	dom.firstElementChild.href = gameListItem.url;
+	return dom;
+}
+function displayGameList(gameList)
+{
+	for(var i=0; i<gameList.length; i++)
+	{
+		gameListDOM.insertBefore(
+			createGameListItem(gameList[i]),
+			gameListDOM.lastElementChild
+		);
+	}
+	gameListDOM.classList.add('finish');
+}
+function displayGameListFail(gameList)
+{
+	gameListDOM.classList.add('failed');
+}
+
+user.socket.on('connect', function(){user.socket.emit("askGameList");});
+user.socket.on("gameList", displayGameList);
+user.socket.on('disconnect', displayGameListFail);
+user.socket.on('connect_error', displayGameListFail);
+</script>
+</body>
+</html>

@@ -2,13 +2,65 @@
 <html>
 <head>
 	<title>Poker</title>
+	<meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0" />
 	<link href="style.css" rel="stylesheet" type="text/css">
 	<link href="GUIstyle.css" rel="stylesheet" type="text/css">
-	<style></style>
+	<link href="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.css" rel="stylesheet" type="text/css">
+	<style>
+	#roomLinkCopyBtn.success span::after{
+		content: " Done!";
+	}
+	#roomLinkCopyBtn.failed span::after{
+		content: "...Oops! Failed...";
+	}
+	.ui-icon-copy:after {
+		background-image: url('https://clipboardjs.com/assets/images/clippy.svg');
+		background-size: 60%;
+		background-color: inherit;
+	}
+	#panelBtn {
+		background: rgba(240,240,240,1);
+	}
+	</style>
 </head>
 <body>
-<div class="topScreen guiScreen poker" id='gui'>
+<div id="mainFrame" class="mainFrame">
+<div class="toolbar">
+<a id="panelBtn" href="#leftPanel" 
+	class="ui-link ui-btn ui-icon-bars ui-btn-icon-left ui-btn-inline ui-shadow ui-corner-all ui-mini"
+>Info</a>
 </div>
+<div class="guiScreen poker" id='gui'>
+</div>
+</div>
+<div id='leftPanel' data-role="panel" data-display="overlay">
+	<div class="panelContent">
+	<div class="fixUI" id='userInfo'>
+		<h3>User Info</h3>
+		Your Name: <span id="userName" class="nameField">User</span><br>
+	</div>
+	<hr>
+	<div id='roomInfo' >
+		<h3>Room Info</h3>
+		You are in the <span id="roomName" class="nameField">Empty</span><br>
+		Copy and Share its link: 
+		<div class="inputButtonSet">
+		<input id="roomLinkText" value="">
+		<a id="roomLinkCopyBtn" class="button
+		ui-link ui-btn ui-icon-copy ui-btn-icon-left ui-btn-inline ui-shadow ui-corner-all ui-mini"
+		>
+		<span>Copy</span>
+		</a>
+		</div>
+	</div>
+	<hr>
+	<div class="fixUI" id='gameConsole' gameStatus="waitStart">
+		<h3>Game Info</h3>
+		You are playing <span id="userName" class="nameField">game</span><br>
+	</div>
+	</div>
+</div>
+
 <div class="topScreen">
 	<div>Message: <span id="messageDisplay"></span></div>
 	<div>Current Player: <span id="playerDisplay"></span></div>
@@ -22,7 +74,10 @@
 	<div class="objectName">Game Status</div>
 	<div class="object" id="gameStatusDisplay"></div>
 </div>
-<script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
+	<script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
+	<script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/clipboard.js/1.5.12/clipboard.min.js"></script>
+	<script src="./socket.io/socket.io.js"></script>
 <script src="ObjectExt.js"></script>
 <script src="MathExt.js"></script>
 <script src="ArrayExt.js"></script>
@@ -32,8 +87,75 @@
 <script src="connectServer.js"></script>
 <script language="javascript" defer>
 // debugger;
+function getRoomURL(){
+	if(user.room == undefined && user.room.id == undefined)
+	{
+		alert("You are not in the room yet!");
+		return "";
+	}
+	var	newSearch = location.search
+		.slice(1).split('&')
+		.filter(function(v){return !v.startsWith('roomId=')})
+		.concat(["roomId=" + user.room.id])
+		.join('&')
+	return location.origin + location.pathname + "?" + newSearch;
+}
+user.socket.on('roomInfo', function(){
+	document.getElementById('roomLinkText').value = getRoomURL();
+	document.getElementById('roomName').innerHTML = user.room.name;
+});
+var roomLinkCopyBtn = document.getElementById('roomLinkCopyBtn');
+var roomLinkCopy = new Clipboard('#roomLinkCopyBtn', {
+	text: getRoomURL,
+});
+function copyBtnMsgClean(){roomLinkCopyBtn.classList.remove('success','failed')};
+roomLinkCopy.on('success', function(){
+	roomLinkCopyBtn.classList.add('success');
+	setTimeout(copyBtnMsgClean ,1000);
+});
+roomLinkCopy.on('error', function(){
+	roomLinkCopyBtn.classList.add('failed');
+	setTimeout(copyBtnMsgClean ,1000);
+});
 
-
+gameConsole = document.getElementById("gameConsole");
+function displayGameBreak(event)
+{
+	if(event && event.message)
+		alert(event.message);
+	gameConsole.setAttribute('gameStatus','end');
+}
+function displayGameRunning()
+{
+	gameConsole.setAttribute('gameStatus','running');
+}
+function checkGameStatus(gameView)
+{
+	if(gameView.status == "GameEnd")
+		displayGameBreak();
+	else 
+	{
+		displayGameRunning();
+	}
+}
+function displayUserEvent(eventData)
+{
+	if(eventData.in)
+		eventData.in; //TODO
+	if(eventData.out)
+		eventData.out; // TODO
+	if(eventData.enoughPlayer)
+		gameConsole.setAttribute('enoughPlayer','true');
+	else
+		gameConsole.setAttribute('enoughPlayer','false');
+}
+function gameBreak()
+{
+console.log('D C');
+}
+user.socket.on('game', checkGameStatus);
+user.socket.on('user', displayUserEvent);
+user.socket.on('disconnect', gameBreak);
 
 function progressGo(opted)
 {

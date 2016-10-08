@@ -1,6 +1,7 @@
 ﻿
 var PokerGame = require("./Poker.js").PokerGame;
 //var Robot = require("./Robot.js").Robot;
+var gameList = require("./gameList");
 
 
 rooms = [];
@@ -98,19 +99,7 @@ createUser = function(socket){
 	socket.on("error", function(er){ 
 		console.log(er.message);
 		console.log(er.stack);
-		socket.emit("Error", {"message": er.message});
-	});
-	socket.on("disconnect", function(){ 
-		if(true || user != undefined)
-		{
-			//console.log(user.name + " disconnect.");
-			//user.leaveSystem();
-		}
-		else
-		{
-			//console.log("someone disconnect.");
-		}
-		console.log("disconnect");
+		socket.emit("Error", {"message": er.message, "type": 'ServerSocketError'});
 	});
 	
 	// ignore above
@@ -124,25 +113,36 @@ createUser = function(socket){
 	user.socket = socket;
 	console.log(user.name + " connected");
 	socket.emit("checkRoom");
+	socket.on("askGameList", function(data)
+	{
+		socket.emit("gameList",gameList);
+	});
 	socket.on("roomQuery", function roomQuery(data)
 	{
 		var newRoom;
-		if(data.roomId == undefined)
+		if(data==undefined || data.roomId == undefined)
 		{
-			console.log("create new room");
-			newRoom = new Room('no matter');
-			newRoom.name = 'room_' + newRoom.id;
+			console.log("create new room for "+user.name);
+			newRoom = new Room();
 		}
 		else
 		{
 			console.log(user.name +" query for roomId: "+ data.roomId);
 			//TODO check rooms is available, and allow user get in
-			newRoom = rooms[data.roomId] || new Room('no matter');
+			if(rooms[data.roomId] == undefined)
+			{
+				socket.emit("roomInfo", {reject: true, rejectMessage: "Queried room does not exist."});
+				return;
+			}
+			else
+			{
+				newRoom = rooms[data.roomId];
+			}
 		}
 		console.log(user.name +" join "+ newRoom.name);
 		newRoom.users.push(user);
 		user.room = newRoom;
-		socket.emit("roomId", {roomId: user.room.id});
+		socket.emit("roomInfo", {roomId: user.room.id, roomName: user.room.name});
 		// TODO: change for each game
 		// check user number
 		//console.log({roomId: user.room.users});
@@ -163,7 +163,8 @@ createUser = function(socket){
 	socket.on("game", function(data){
 		//restartTimer();
 		console.log(data);
-		var actionsForThisUser = user.room.game.waitFor.find((v)=>(v.actor==user.player)).actions;
+		var waitForForThisUser = user.room.game.waitFor.find((v)=>(v.actor==user.player));
+		var actionsForThisUser = (waitForForThisUser ? waitForForThisUser.actions : []);
 		var actionObj = {
 			actor: user.player,
 			action: actionsForThisUser[data.action],
@@ -171,6 +172,17 @@ createUser = function(socket){
 		user.room.game.run(actionObj);
 	});
 	socket.on("disconnect", function(){ 
+		/*
+		if(true || user != undefined)
+		{
+			//console.log(user.name + " disconnect.");
+			//user.leaveSystem();
+		}
+		else
+		{
+			//console.log("someone disconnect.");
+		}
+		*/
 		if(user != undefined && user.room != undefined)
 		{
 			user.room.users.remove(user);
@@ -338,7 +350,7 @@ function Room(name)
 	var id = newId("Room");
 	rooms[id] = this;
 	
-	this.name = name;
+	this.name = name || ("Room "+id);
 	this.users = users;
 	this.game = game;
 	Object.defineProperties(this,
