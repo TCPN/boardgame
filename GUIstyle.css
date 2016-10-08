@@ -113,3 +113,7 @@
 	transition-duration: 1s;
 	transition-timing-function: ease-out;
 }
+.anchor {
+	height: 0;
+	width : 0;
+}
