@@ -33,6 +33,10 @@ body {
 	min-height: 40px;
 	background: black;
 }
+.panelContent {
+	height: 90vh;
+	overflow-y: auto;
+}
 .field {
 	padding-left: 10px;
 }
