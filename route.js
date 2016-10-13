@@ -7,6 +7,7 @@ route = function(pathname){
 		"/GUIDisplay.js"		: "/GUIDisplay.js",
 		"/connectServer.js"		: "/connectServer.js",
 		"/ObjectDisplayer.js"	: "/ObjectDisplayer.js",
+		"/displayMessage.js"	: "/displayMessage.js",
 		
 		"/favicon.ico" 			: "/resistance icon.png",
 		"/socket.io.test" 		: "/socketiotest.html",

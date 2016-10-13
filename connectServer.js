@@ -97,7 +97,7 @@ function newUserEnter()
 		{
 			user.gameView = data.gameView;
 			// this only handle game GUI
-			GUIDisplay(user.gameView, document.getElementById('gui'),{ gameAction: sendGameAction});
+			GUIDisplay(user.gameView, document.getElementById('gui'),{ gameAction: sendGameAction, displayMessage: displayMessage});
 		}
 		
 		try{
