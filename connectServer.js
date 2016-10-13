@@ -38,6 +38,9 @@ function newUserEnter()
 	{
 		user.socket.emit_t("game", data);
 	}
+	user.socket.on('connect', function(){
+		user.socket.emit("setUserProfile", {name: user.name, password: user.password, img: user.imgUrl});
+	});
 	//user.socket.emit("login", {name: user.name, password: user.password});
 	user.socket.on("AskForName", function(){
 		user.socket.emit("login", {name: user.name, password: user.password});
@@ -58,8 +61,60 @@ function newUserEnter()
 			// go back to game list
 			location.href = location.origin+"/";
 		}
-		console.log("get roomId: "+data.roomId);
-		user.room = {id: data.roomId, name: data.roomName};
+		if(data.roomId)
+		{
+			console.log("get roomId: "+data.roomId);
+			user.room = {id: data.roomId, name: data.roomName};
+		}
+		if(data.userList)
+		{
+			var ul = document.getElementById('userList');
+			if(ul)
+			{
+				var ids = data.userList.map(function(v){return v.id;});
+				var oids = Array.from(ul.children).map(function(v){return v.userId});
+				
+				var iddiff = ids.diffTo(oids);
+				
+				iddiff.surpass.forEach(function(id){
+					var thisUser = data.userList.find(function(u){return u.id==id;});
+					var nl = document.createElement('li');
+					nl.id = 'userListItem_'+thisUser.id;
+					nl.classList.add("userListItem");
+					nl.userId = thisUser.id;
+					nl.textContent = thisUser.name || ('user_'+thisUser.id);
+					ul.appendChild(nl);
+				});
+				
+				iddiff.lack.forEach(function(id){
+					var userListItemDOM = Array.from(ul.children).find(function(u){return u.userId==id;});
+					userListItemDOM.remove();
+				});
+			}
+		}
+		if(data.gameMeta)
+		{
+			var gn = document.getElementById('gameName');
+			if(gn)
+				gn.textContent = data.gameMeta.name;
+			var gpn = document.getElementById('gamePlayerNumber');
+			if(gpn)
+				gpn.textContent = data.gameMeta.playerNumber.join(',');
+		}
+		if(data.gameReady != undefined)
+		{
+			var gamebtn = document.getElementById('gamePowerSwitch');
+			if(data.gameReady)
+			{
+				displayMessage("Time to play!","room","3");
+				if(gamebtn) gamebtn.classList.remove('ui-disabled');
+			}
+			else
+			{
+				displayMessage("Wait for more players~","room","3");
+				if(gamebtn) gamebtn.classList.add('ui-disabled');
+			}
+		}
 	});
 	user.socket.on("toClient", function(data){
 		user.socketTimer.forEach(clearTimeout);

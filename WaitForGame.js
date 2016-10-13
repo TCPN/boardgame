@@ -10,6 +10,7 @@ lobby = new Room("大廳");
 onlineUsers = {};
 function newId(name)
 {
+	// TODO: reuse id, by pooling
 	if(newId[name] == undefined || newId[name] >= 100000000000)
 	{
 		newId[name] = 0;
@@ -103,19 +104,25 @@ createUser = function(socket){
 	});
 	
 	// ignore above
+	var uid = newId('User'); // TODO: this is temporary
 	user = new User(
-		"user_"+newId('User'),
+		"user_"+uid,
 		"",
 		function takeGameMessage(data){
 			user.socket.emit("toClient", {cmd:"game", gameView: data});
 		}
 	);
+	user.id = uid; // TODO: this is temporary
 	user.socket = socket;
 	console.log(user.name + " connected");
 	socket.emit("checkRoom");
 	socket.on("askGameList", function(data)
 	{
-		socket.emit("gameList",gameList);
+		socket.emit("gameList",gameList); // TODO: remove unsafe info, like filepath
+	});
+	socket.on("setUserProfile", function setUserName(data){ // TODO: this is kind of split with the other roomInfo emission
+		user.name = data.name;
+		user.room.updateUserInfo();
 	});
 	socket.on("roomQuery", function roomQuery(data)
 	{
@@ -123,7 +130,7 @@ createUser = function(socket){
 		if(data==undefined || data.roomId == undefined)
 		{
 			console.log("create new room for "+user.name);
-			newRoom = new Room();
+			newRoom = new Room(data && data.roomName);
 		}
 		else
 		{
@@ -142,23 +149,31 @@ createUser = function(socket){
 		console.log(user.name +" join "+ newRoom.name);
 		newRoom.users.push(user);
 		user.room = newRoom;
-		socket.emit("roomInfo", {roomId: user.room.id, roomName: user.room.name});
+		socket.emit("roomInfo", {
+			roomId: user.room.id, 
+			roomName: user.room.name,
+		});
+		user.room.updateUserInfo();
 		// TODO: change for each game
 		// check user number
 		//console.log({roomId: user.room.users});
+		
 		if(user.room.users.length == 2)
 		{
 			console.log("Let's Play!");
 			
 			// TODO: refactor this
-			user.room.game = new PokerGame(user.room.users);
-			user.room.game.run();
 		}
 		else
 		{
 			socket.emit("waitPlayersJoin", {userNumber:user.room.users.length});
 			console.log("waitPlayersJoin");
 		}
+	});
+	socket.on("startGame", function(data){
+		//restartTimer();
+		user.room.game = new PokerGame(user.room.users);
+		user.room.game.run();
 	});
 	socket.on("game", function(data){
 		//restartTimer();
@@ -186,6 +201,7 @@ createUser = function(socket){
 		if(user != undefined && user.room != undefined)
 		{
 			user.room.users.remove(user);
+			user.room.updateUserInfo();
 		}
 		console.log(user.name + "disconnect");
 	});
@@ -352,6 +368,8 @@ function Room(name)
 	
 	this.name = name || ("Room "+id);
 	this.users = users;
+	this.gameClass = PokerGame;
+	this.gameMeta = gameList.find((g)=>g.name=='Poker');
 	this.game = game;
 	Object.defineProperties(this,
 		{
@@ -361,6 +379,17 @@ function Room(name)
 	)
 	this.indexOf = function(user){ return users.indexOf(user);}
 	this.contain = function(user){ return (this.indexOf(user) >= 0);}
+	this.updateUserInfo = function updateUserInfo(){
+		var emitData = {};
+		emitData.userList = this.users.map((u)=>({id: u.id, name:u.name}));
+		if(id != 0)
+		{
+			emitData.gameMeta = this.gameMeta;
+			emitData.gameReady = (this.gameMeta!=undefined && this.gameMeta.playerNumber.includes(this.users.length));
+			emitData.gameRunning = this.game!=undefined;
+		}
+		this.users.forEach((u)=>u.socket.emit("roomInfo", emitData));
+	}
 	
 	this.broadcast = function(msg){
 		for(var i in users)

@@ -52,11 +52,17 @@
 		<span>Copy</span>
 		</a>
 		</div>
+		<h4>All Users:</h4>
+		<ul id="userList"></ul>
 	</div>
 	<hr>
 	<div class="fixUI" id='gameConsole' gameStatus="waitStart">
 		<h3>Game Info</h3>
-		You are playing <span id="userName" class="nameField">game</span><br>
+		You are playing <span id="gameName" class="nameField">no game</span><br>
+		Player Number:<span id="gamePlayerNumber" class="nameField">unavailable</span><br>
+		<a id="gamePowerSwitch" class="button
+		ui-link ui-btn ui-shadow ui-corner-all ui-disabled"
+		><span>Start Game</span></a>
 	</div>
 	</div>
 </div>
@@ -81,12 +87,15 @@
 <script src="ObjectExt.js"></script>
 <script src="MathExt.js"></script>
 <script src="ArrayExt.js"></script>
+<script src="displayMessage.js"></script>
 <script src="GUIDisplay.js"></script>
 <script src="ObjectDisplayer.js"></script>
 <script src="parseURLQuery.js"></script>
 <script src="connectServer.js"></script>
 <script language="javascript" defer>
 // debugger;
+displayMessage("Welcome! " + user.name, 'greetings', 2); 
+document.getElementById('userName').textContent = user.name;
 function getRoomURL(){
 	if(user.room == undefined && user.room.id == undefined)
 	{
@@ -100,7 +109,13 @@ function getRoomURL(){
 		.join('&')
 	return location.origin + location.pathname + "?" + newSearch;
 }
-user.socket.on('roomInfo', function(){
+document.getElementById('gamePowerSwitch').addEventListener('click', function gamePowerSwitchClick(evt){
+	if(this.classList.contains('ui-disabled') || this.classList.contains('disabled'))
+		return;
+	else
+		user.socket.emit('startGame');
+});
+user.socket.on('roomInfo', function(){ // TODO: some related codes in connectServer.js, where to put these?
 	document.getElementById('roomLinkText').value = getRoomURL();
 	document.getElementById('roomName').innerHTML = user.room.name;
 });
@@ -151,7 +166,8 @@ function displayUserEvent(eventData)
 }
 function gameBreak()
 {
-console.log('D C');
+console.log('game stopped');
+//displayMessage('Game Stopped!', 'room', 5);
 }
 user.socket.on('game', checkGameStatus);
 user.socket.on('user', displayUserEvent);
