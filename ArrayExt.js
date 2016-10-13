@@ -26,3 +26,26 @@ Array.prototype.shuffle = function()
 	}
 	return this;
 }
+Array.prototype.diffTo = function(array)
+{
+	var ret={overlap:[], surpass:[], lack:[]};
+	var dupme = this.concat([]);
+	var dupar = array.concat([]);
+	var it = 0;
+	while(dupme.length > 0)
+	{
+		it = dupme.shift();
+		var ind = dupar.indexOf(it);
+		if(ind < 0)
+		{
+			ret.surpass.push(it);
+		}
+		else
+		{
+			ret.overlap.push(it);
+			dupar.remove(it);
+		}
+	}
+	ret.lack = dupar;
+	return ret;
+}
