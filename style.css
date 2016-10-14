@@ -58,11 +58,12 @@ body {
 	min-width: 0;
 	min-height: 0;*/
 	border-style: inset;
+	border-width: 3px;
 	flex-grow: 1;
 }
 @media (orientation: landscape) {
 	.guiScreen {
-		width: calc(100vw - 80px);
+		width: calc(100vw - 86px); /* width of side bar:80, border width of screen:3+3 */
 	}
 }
 @media (orientation: portrait) {
