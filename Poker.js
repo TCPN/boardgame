@@ -27,8 +27,9 @@ function PokerGame(users)
 		}
 
 
-		
-	var thisGame = Game.apply(this).setPlayerNumber(2);
+	if(users.length > 4 && users.length < 2)
+		throw new Error("Inproper Number of Players");
+	var thisGame = Game.apply(this).setPlayerNumber(users.length);
 	// assume users is Array
 	if(users != undefined) users.forEach(function(u,i){u.player = thisGame.players[i];u.player.user=u;});
 	thisGame.skipFieldWhenView.add('initDeck');
