@@ -23,7 +23,7 @@ function Game()
 	}
 	this.skipFieldWhenView = new Set(
 		['parent','coverable','canSee','waitFor','status',
-		'defaultCanSee','skipFieldWhenView', 'user']);
+		'defaultCanSee','skipFieldWhenView']);
 	this.inViewOf = function(player)
 	{
 		var optable = [];
@@ -56,7 +56,13 @@ function Game()
 							continue;
 						if(destObj.type == 'Deck' && k == 'items') // deck.items == deck.cards, keep only one of them
 							continue;
-						if(k == 'winner' && sourceObj[k] != undefined) // deck.items == deck.cards, keep only one of them
+						if(k == 'user')
+						{
+							destObj['userId'] = sourceObj[k].id || -1;
+							destObj['userName'] = sourceObj[k].name || 'user_'+sourceObj[k].id || 'user';
+							continue;
+						}
+						if(k == 'winner' && sourceObj[k] != undefined)
 						{
 							destObj['myVictory'] = (sourceObj[k] == player);
 						}
