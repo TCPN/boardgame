@@ -152,7 +152,33 @@ function newUserEnter()
 		{
 			user.gameView = data.gameView;
 			// this only handle game GUI
-			GUIDisplay(user.gameView, document.getElementById('gui'),{ gameAction: sendGameAction, displayMessage: displayMessage});
+			var handlesFunc = { gameAction: sendGameAction, displayMessage: displayMessage};
+			var hasAction = GUIDisplay(user.gameView, document.getElementById('gui'), handlesFunc);
+			if(hasAction)
+			{
+				var notiIconsUrl = [
+				'https://scontent-tpe1-1.xx.fbcdn.net/t39.1997-6/p128x128/851582_1398251680393015_481386137_n.png',
+				'https://scontent-tpe1-1.xx.fbcdn.net/t39.1997-6/p128x128/851578_654446867903727_1544492378_n.png',
+				'https://scontent-tpe1-1.xx.fbcdn.net/t39.1997-6/p128x128/10574681_1498876463686817_1148331481_n.png',
+				'https://scontent-tpe1-1.xx.fbcdn.net/t39.1997-6/p128x128/10734314_1601168460115072_1201753541_n.png',
+				'https://sdl-stickershop.line.naver.jp/stickershop/v1/product/1287660/iphone/main@2x.png',
+				'https://sdl-stickershop.line.naver.jp/stickershop/v1/product/1287665/iphone/main@2x.png',
+				];
+				if(!document.hasFocus())
+				{
+					var noti = new Notification("It's Your Turn!", {
+						icon: notiIconsUrl[Math.randomi(notiIconsUrl.length)],
+						body: 'Waiting for you~~',
+					});
+					var closeNoti = function(){
+						window.removeEventListener("focus", closeNoti);
+						noti.close();
+					};
+					window.addEventListener("focus", closeNoti);
+					//setTimeout(closeNoti, 5000); // keep the notification, until it's read.
+					noti.onclick = function(){window.focus()};
+				}
+			}
 		}
 		
 		try{
@@ -181,3 +207,4 @@ function newUserEnter()
 }
 
 newUserEnter();
+Notification.requestPermission();

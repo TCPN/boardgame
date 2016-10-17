@@ -1,5 +1,6 @@
 function GUIDisplay(game, screen, handlers)
 {
+	var hasAction = false;
 	function display(item, name){
 		if(item.constructor == Object)
 		{
@@ -18,6 +19,7 @@ function GUIDisplay(game, screen, handlers)
 		if(obj.optionIndex > -1)
 		{
 			objDOM.classList.add('option');
+			hasAction = true;
 		}
 		else
 		{
@@ -147,4 +149,5 @@ function GUIDisplay(game, screen, handlers)
 		else 
 			display(game[k],k);
 	}
+	return hasAction;
 }
