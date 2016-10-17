@@ -75,8 +75,19 @@
 .view0 {
 	order: 99;
 }
-.view1 {
+.view1, .view2, .view3 {
 	order: 1;
+}
+[playerNumber="3"] .view1, [playerNumber="3"] .view2 {
+	width: calc(45% - 2vw);
+	padding: 2vw;
+}
+[playerNumber="2"] .view2, [playerNumber="2"] .view3, [playerNumber="3"] .view3 {
+	display: none;
+}
+[playerNumber="4"] .view1, [playerNumber="4"] .view2, [playerNumber="4"] .view3 {
+	width: calc(30% - 2vw);
+	padding: 2vw;
 }
 
 .option {
@@ -116,4 +127,13 @@
 .anchor {
 	height: 0;
 	width : 0;
+}
+.anchor.playerLabelAnchor {
+	position: relative;
+	top: 10vh; /*half of the card height*/
+	/*overflow: visible;*/
+}
+.playerLabel {
+	width: min-content;
+	background: rgba(250,255,255,0.9);
 }

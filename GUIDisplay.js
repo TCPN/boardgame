@@ -113,6 +113,7 @@ function GUIDisplay(game, screen, handlers)
 			handlers.displayMessage((game.myVictory ? 'YOU WIN!' : 'You Lose.'), 'regular', 5); // this is the only place using displayMessage
 		if(k == 'players') // assume 'players' contains all players, assume it's Array
 		{
+			screen.setAttribute('playerNumber', game.players.length); // give info about player number
 			var p = game.inViewOf;
 			var pn = game.players.length;
 			var originalStart = p;
@@ -120,6 +121,14 @@ function GUIDisplay(game, screen, handlers)
 			{
 				for(var pk in game.players[p])
 					display(game.players[p][pk],'view'+((p-originalStart+pn)%pn)+' '+pk);
+				// TODO: give name label a better position in the DOM tree
+				var hdDOM = document.getElementsByClassName('view'+((p-originalStart+pn)%pn)+' handDeck')[0];
+				var anc = document.createElement('div');
+				anc.classList.add('anchor','playerLabelAnchor');
+				var nlb = anc.insertBefore(document.createElement('div'),null);
+				nlb.classList.add('playerLabel');
+				nlb.textContent = game.players[p].userName;
+				hdDOM.insertBefore(anc, hdDOM.firstElementChild);
 				p = (p+1)%pn;
 			}
 			while(p != originalStart);
