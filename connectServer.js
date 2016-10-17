@@ -106,7 +106,7 @@ function newUserEnter()
 			var gamebtn = document.getElementById('gamePowerSwitch');
 			if(data.gameReady)
 			{
-				displayMessage("Time to play!","room","3");
+				displayMessage("You can start a game now!","room","3");
 				if(gamebtn) gamebtn.classList.remove('ui-disabled');
 			}
 			else
