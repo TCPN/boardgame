@@ -27,6 +27,7 @@ function GUIDisplay(game, screen, handlers)
 		// *** should not need in online version
 		objDOM.playerIndex = game.inViewOf; // now inViewOf only contains player Index
 	}
+	
 	function DisplayDeck(deckScreen, deck, deckName)
 	{
 		var deckDOM = deckScreen.getElementsByClassName(deckName)[0];
@@ -62,6 +63,20 @@ function GUIDisplay(game, screen, handlers)
 		// insert card DOMs according to  newArrange
 		newArrange.forEach(function(c){deckDOM.insertBefore(c,null);});
 		return deckDOM;
+	}
+	function getPlayerLabelDOM(parentDOM, name)
+	{
+		var anc = parentDOM.getElementsByClassName('anchor playerLabelAnchor')[0];
+		if(anc == undefined)
+		{
+			anc = document.createElement('div');
+			anc.classList.add('anchor','playerLabelAnchor');
+			anc.insertBefore(document.createElement('div'),null);
+			anc.firstElementChild.classList.add('playerLabel');
+		}
+		var nlb = anc.getElementsByClassName('playerLabel')[0];
+		nlb.textContent = name;
+		return anc;
 	}
 
 	function guiCardName(card)
@@ -122,13 +137,9 @@ function GUIDisplay(game, screen, handlers)
 				for(var pk in game.players[p])
 					display(game.players[p][pk],'view'+((p-originalStart+pn)%pn)+' '+pk);
 				// TODO: give name label a better position in the DOM tree
-				var hdDOM = document.getElementsByClassName('view'+((p-originalStart+pn)%pn)+' handDeck')[0];
-				var anc = document.createElement('div');
-				anc.classList.add('anchor','playerLabelAnchor');
-				var nlb = anc.insertBefore(document.createElement('div'),null);
-				nlb.classList.add('playerLabel');
-				nlb.textContent = game.players[p].userName;
-				hdDOM.insertBefore(anc, hdDOM.firstElementChild);
+				var handdeckDOM = document.getElementsByClassName('view'+((p-originalStart+pn)%pn)+' handDeck')[0];
+				var labelDOM = getPlayerLabelDOM(handdeckDOM, game.players[p].userName);
+				handdeckDOM.insertBefore(labelDOM, handdeckDOM.firstElementChild);
 				p = (p+1)%pn;
 			}
 			while(p != originalStart);

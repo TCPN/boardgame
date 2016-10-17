@@ -134,6 +134,8 @@
 	/*overflow: visible;*/
 }
 .playerLabel {
-	width: min-content;
+	width: 13vh; /* for old browser*/
+	text-align: center;
+	width: max-content;
 	background: rgba(250,255,255,0.9);
 }
