@@ -172,7 +172,7 @@ createUser = function(socket){
 	});
 	socket.on("startGame", function(data){
 		//restartTimer();
-		user.room.game = new PokerGame(user.room.users);
+		user.room.game = new PokerGame(user.room.users, data.settings);
 		user.room.game.run();
 	});
 	socket.on("game", function(data){
