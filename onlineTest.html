@@ -60,6 +60,8 @@
 		<h3>Game Info</h3>
 		You are playing <span id="gameName" class="nameField">no game</span><br>
 		Player Number:<span id="gamePlayerNumber" class="nameField">unavailable</span><br>
+		<h4>Settings</h4>
+		<div id='gameSettings'></div>
 		<a id="gamePowerSwitch" class="button
 		ui-link ui-btn ui-shadow ui-corner-all ui-disabled"
 		><span>Start Game</span></a>
@@ -113,7 +115,10 @@ document.getElementById('gamePowerSwitch').addEventListener('click', function ga
 	if(this.classList.contains('ui-disabled') || this.classList.contains('disabled'))
 		return;
 	else
-		user.socket.emit('startGame');
+	{
+		var settings = getSettingsValue();
+		user.socket.emit('startGame', {settings:settings});
+	}
 });
 user.socket.on('roomInfo', function(){ // TODO: some related codes in connectServer.js, where to put these?
 	document.getElementById('roomLinkText').value = getRoomURL();

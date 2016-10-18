@@ -94,12 +94,88 @@ function newUserEnter()
 		}
 		if(data.gameMeta)
 		{
-			var gn = document.getElementById('gameName');
-			if(gn)
-				gn.textContent = data.gameMeta.name;
-			var gpn = document.getElementById('gamePlayerNumber');
-			if(gpn)
-				gpn.textContent = data.gameMeta.playerNumber.join(',');
+			var gameConsole = document.getElementById('gameConsole');
+			if(gameConsole)
+			{
+				var gn = document.getElementById('gameName');
+				if(data.gameMeta.name != gn.textContent)
+				{
+					var gpn = document.getElementById('gamePlayerNumber');
+					var gset = document.getElementById('gameSettings');
+					gn.textContent = data.gameMeta.name;
+					gpn.textContent = data.gameMeta.playerNumber.join(',');
+					function getSettingForm(settings)
+					{
+						var dom = document.createElement('div');
+						if('type' in settings)
+						{
+							if(settings.type == 'checkbox')
+							{
+								dom.classList.add('gameSettingsCheckboxSet');
+								var b = document.createElement('input');
+								b.type = 'checkbox';
+								b.checked = settings.default;
+								var t = document.createElement('span');
+								t.textContent = settings.text || "";
+								dom.insertBefore(b,null);
+								dom.insertBefore(t,null);
+							}
+							else
+							{
+								console.log('unrecognized setting type: '+ settings.type);
+								delete(settings.type); // treat as group
+								return getSettingForm(settings);
+							}
+						}
+						else // no type means a settings group
+						{
+							dom.classList.add('gameSettingsGroup');
+							for(var k in settings)
+							{
+								if(k == "text")
+								{
+									var textLabel = document.createElement('div');
+									textLabel.classList.add('gameSettingsGroupTitle');
+									textLabel.textContent = settings.text;
+									dom.insertBefore(textLabel,dom.firstElementChild);
+								}
+								else
+								{
+									var child = getSettingForm(settings[k]);
+									child.name = k;
+									dom.insertBefore(child,null);
+								}
+							}
+						}
+						return dom;
+					}
+					getSettingsValue = function(settingsGroupDOM)
+					{
+						if(settingsGroupDOM == undefined)
+						{
+							var form = document.getElementById('gameSettings');
+							form = form && form.firstElementChild; // a gameSettingsGroup
+							return getSettingsValue(form);
+						}
+						else
+						{
+							var settings = {};
+							for( var i=0; i < settingsGroupDOM.children.length; i++)
+							{
+								var childDOM = settingsGroupDOM.children[i];
+								var fieldName = childDOM.name;
+								if(childDOM.classList.contains('gameSettingsCheckboxSet'))
+									settings[fieldName] = childDOM.firstElementChild.checked;
+								else if(childDOM.classList.contains('gameSettingsGroup'))
+									settings[fieldName] = getSettingsValue(childDOM);
+							}
+							return settings;
+						}
+					}
+					gset.innerHTML = '';
+					gset.appendChild(getSettingForm(data.gameMeta.settings));
+				}
+			}
 		}
 		if(data.gameReady != undefined)
 		{

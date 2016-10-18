@@ -81,3 +81,17 @@ body {
 .inputButtonSet .button{
 	flex-shrink: 0;
 }
+
+h4 {
+	margin-bottom: 0px;
+}
+.gameSettingsGroup {
+	padding-left: 5px;
+}
+.gameSettingsCheckboxSet {
+	display: flex;
+}
+.gameSettingsGroupTitle {
+	font-weight: bold;
+	margin-top: 5px;
+}
