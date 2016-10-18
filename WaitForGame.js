@@ -121,6 +121,7 @@ createUser = function(socket){
 		socket.emit("gameList",gameList); // TODO: remove unsafe info, like filepath
 	});
 	socket.on("setUserProfile", function setUserName(data){ // TODO: this is kind of split with the other roomInfo emission
+		console.log(user.name + ' renamed to '+data.name);
 		user.name = data.name;
 		user.room.updateUserInfo();
 	});
@@ -203,7 +204,7 @@ createUser = function(socket){
 			user.room.users.remove(user);
 			user.room.updateUserInfo();
 		}
-		console.log(user.name + "disconnect");
+		console.log(user.name + " disconnect");
 	});
 }
 
