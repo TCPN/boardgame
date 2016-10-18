@@ -26,7 +26,9 @@ function PokerGame(users, settings)
 			cards.push(newcard);
 		}
 
-
+	users = users.concat([]); // duplicate it
+	if(settings.RandomPlayerOrder)
+		users.shuffle();
 	if(users.length > 4 && users.length < 2)
 		throw new Error("Inproper Number of Players");
 	var thisGame = Game.apply(this).setPlayerNumber(users.length);
