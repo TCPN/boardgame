@@ -90,6 +90,13 @@ function PokerGame(users, settings)
 				return {isLegal: false, message: 'Not the current player'};
 			if(choice == thisGame.poolDeck) //pass
 				return {isLegal: true};
+			else if(thisGame.outDeck.cards.indexOf(choice) >= 0)
+			{
+				if(thisGame.outDeck.length > 1)
+					return {isLegal: true};
+				else
+					return {isLegal: false, message: 'Cannot Take The Initial Out Card'};
+			}
 			else
 			{
 				let lastPoint = thisGame.outDeck.bottomCard(1).point;
@@ -115,6 +122,7 @@ function PokerGame(users, settings)
 						actor: thisGame.currentPlayer,
 						actions: thisGame.currentPlayer.handDeck.cards
 								.concat(thisGame.poolDeck)
+								.concat((settings.drawCardFrom.outDeck && thisGame.outDeck.length > 1) ? thisGame.outDeck.bottomCard(1) : [])
 								.filter((v)=>outCardVerify(thisGame.currentPlayer,v).isLegal)
 					}]
 					);
@@ -132,10 +140,18 @@ function PokerGame(users, settings)
 			}
 			if(choice != thisGame.poolDeck)
 			{
-				thisGame.conPass = 0;
-				Game.move(choice, thisGame.outDeck);
-				if(thisGame.currentPlayer.handDeck.length == 0)
-					break;
+				if(thisGame.outDeck.cards.indexOf(choice) >= 0) // choose the top card in outDeck
+				{
+					thisGame.conPass = 0;
+					Game.move(choice, thisGame.currentPlayer.handDeck);
+				}
+				else
+				{
+					thisGame.conPass = 0;
+					Game.move(choice, thisGame.outDeck);
+					if(thisGame.currentPlayer.handDeck.length == 0)
+						break; // game end
+				}
 			}
 			else
 			{
