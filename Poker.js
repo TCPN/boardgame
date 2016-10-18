@@ -114,7 +114,7 @@ function PokerGame(users, settings)
 					[{
 						actor: thisGame.currentPlayer,
 						actions: thisGame.currentPlayer.handDeck.cards
-								.concat(thisGame.poolDeck.length > 0 ? thisGame.poolDeck : [] )
+								.concat(thisGame.poolDeck)
 								.filter((v)=>outCardVerify(thisGame.currentPlayer,v).isLegal)
 					}]
 					);
@@ -139,11 +139,12 @@ function PokerGame(users, settings)
 			}
 			else
 			{
-				if(thisGame.poolDeck.length != 0)
+				if(thisGame.poolDeck.length > 0)
 					Game.move(thisGame.poolDeck.topCard(1), thisGame.currentPlayer.handDeck);
-				thisGame.conPass += 1;
-				if(thisGame.poolDeck.length == 0 && thisGame.conPass == 2)
-					break;
+				else
+					thisGame.conPass += 1;
+				if(thisGame.poolDeck.length == 0 && thisGame.conPass == thisGame.players.length)
+					break; // game end
 			}
 			thisGame.currentPlayer = thisGame.players[(thisGame.players.indexOf(thisGame.currentPlayer)+1)%thisGame.players.length];
 		}

@@ -41,6 +41,14 @@
 .deck.poolDeck {
 	order: 50;
 }
+.deck.poolDeck:empty {
+	width: 30%;
+	background: rgba(250,255,255,0.2);
+}
+.deck.poolDeck.option:empty:after {
+	font-size: x-large;
+	content: "PASS";
+}
 .deck.top img {
 	border-bottom-style: solid;
 	border-right-style: solid;

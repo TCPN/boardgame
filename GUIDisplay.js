@@ -46,8 +46,8 @@ function GUIDisplay(game, screen, handlers)
 		var numChange = deck.length - oldCardDOMs.length;
 		var newArrange = [];
 		var initCi = 0, endCi = deck.length;
-		if(deck.length <= 0)
-			endCi = 0;
+		if(deck.length == 0)
+			/*endCi = 0*/;
 		else if(deck.showPart == 'top')
 			endCi = 1;
 		else if(deck.showPart == 'bottom')
