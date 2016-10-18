@@ -38,8 +38,20 @@ function newUserEnter()
 	{
 		user.socket.emit_t("game", data);
 	}
+	setUserProfile = function(data)
+	{
+		user.name = data.name || user.name;
+		user.password = data.password || user.password;
+		user.imgUrl = data.imgUrl || user.imgUrl;
+		
+		document.cookie = "username=" + user.name;
+		document.cookie = "userpassword=" + (user.password||"");
+		document.cookie = "userimgurl=" + (user.imgUrl||"");
+		
+		user.socket.emit("setUserProfile", data);
+	}
 	user.socket.on('connect', function(){
-		user.socket.emit("setUserProfile", {name: user.name, password: user.password, img: user.imgUrl});
+		setUserProfile({name: user.name, password: user.password, img: user.imgUrl});
 	});
 	//user.socket.emit("login", {name: user.name, password: user.password});
 	user.socket.on("AskForName", function(){
@@ -84,6 +96,12 @@ function newUserEnter()
 					nl.userId = thisUser.id;
 					nl.textContent = thisUser.name || ('user_'+thisUser.id);
 					ul.appendChild(nl);
+				});
+				
+				iddiff.overlap.forEach(function(id){
+					var userListItemDOM = Array.from(ul.children).find(function(u){return u.userId==id;});
+					var thisUser = data.userList.find(function(u){return u.id==id;});
+					userListItemDOM.textContent = thisUser.name || ('user_'+thisUser.id);
 				});
 				
 				iddiff.lack.forEach(function(id){

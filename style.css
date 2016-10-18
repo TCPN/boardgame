@@ -74,6 +74,21 @@ body {
 .nameField {
 	font-weight: bold;
 }
+input.nameField {
+	border: 0;
+	width: 60%;
+}
+input.nameField:disabled {
+	background: white;
+	color: black;
+}
+.oneLineSet {
+	display: flex;
+	align-items: center;
+}
+.oneLineSet span:first-child {
+	flex-shrink: 0;
+}
 .inputButtonSet {
 	display: flex;
 	align-items: center;

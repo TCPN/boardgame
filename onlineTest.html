@@ -37,12 +37,18 @@
 	<div class="panelContent">
 	<div class="fixUI" id='userInfo'>
 		<h3>User Info</h3>
-		Your Name: <span id="userName" class="nameField">User</span><br>
+		<div class="oneLineSet">
+		<span>Your Name:&nbsp;</span>
+		<input id="userName" class="nameField" value="User" data-role="none">
+		</div>
 	</div>
 	<hr>
 	<div id='roomInfo' >
 		<h3>Room Info</h3>
-		You are in the <span id="roomName" class="nameField">Empty</span><br>
+		<div class="oneLineSet">
+		<span>You are in the&nbsp;</span>
+		<input id="roomName" class="nameField" value="Empty" data-role="none" disabled>
+		</div>
 		Copy and Share its link: 
 		<div class="inputButtonSet">
 		<input id="roomLinkText" value="">
@@ -59,7 +65,7 @@
 	<div class="fixUI" id='gameConsole' gameStatus="waitStart">
 		<h3>Game Info</h3>
 		You are playing <span id="gameName" class="nameField">no game</span><br>
-		Player Number:<span id="gamePlayerNumber" class="nameField">unavailable</span><br>
+		Player Number: <span id="gamePlayerNumber" class="nameField">unavailable</span><br>
 		<h4>Settings</h4>
 		<div id='gameSettings'></div>
 		<a id="gamePowerSwitch" class="button
@@ -97,7 +103,16 @@
 <script language="javascript" defer>
 // debugger;
 displayMessage("Welcome! " + user.name, 'greetings', 2); 
-document.getElementById('userName').textContent = user.name;
+var userNameInput = document.getElementById('userName')
+userNameInput.value = user.name;
+userNameInput.addEventListener("focus", function(){userOldName = userNameInput.value;});
+userNameInput.addEventListener("blur", function(){
+	if(userNameInput.value == "")
+		userNameInput.value = userOldName;
+	else
+		setUserProfile({name: userNameInput.value});
+});
+
 function getRoomURL(){
 	if(user.room == undefined && user.room.id == undefined)
 	{
@@ -122,7 +137,7 @@ document.getElementById('gamePowerSwitch').addEventListener('click', function ga
 });
 user.socket.on('roomInfo', function(){ // TODO: some related codes in connectServer.js, where to put these?
 	document.getElementById('roomLinkText').value = getRoomURL();
-	document.getElementById('roomName').innerHTML = user.room.name;
+	document.getElementById('roomName').value = user.room.name;
 });
 var roomLinkCopyBtn = document.getElementById('roomLinkCopyBtn');
 var roomLinkCopy = new Clipboard('#roomLinkCopyBtn', {
