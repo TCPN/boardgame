@@ -15,7 +15,7 @@
 	align-items: center;
 	width: 100%;
 	
-	height: 25%;
+	height: 22%;
 }
 
 .card {
@@ -38,16 +38,23 @@
 .deck.top {
 	width: auto;
 }
-.deck.poolDeck {
+.deck.poolDeck{
 	order: 50;
 }
 .deck.poolDeck:empty {
-	width: 30%;
+	width: 15vh; /* 2/3 card height*/
 	background: rgba(250,255,255,0.2);
 }
 .deck.poolDeck.option:empty:after {
 	font-size: x-large;
 	content: "PASS";
+}
+.deck.openPoolDeck {
+	order: 55;
+	width: auto;
+	max-width: calc(95% - 15vh); /* fill the rest space when the pool deck is beside */
+	margin-left: 1%;
+	margin-right: 2%;
 }
 .deck.top img {
 	border-bottom-style: solid;
@@ -60,8 +67,8 @@
 }
 .deck.outDeck {
 	width: 50%;
-	order: 51;
-	/*background: turquoise;*/
+	order: 60;
+	background: rgba(255,255,255,0.1);
 	margin-left: 10px;
 }
 .deck.outDeck .card {
