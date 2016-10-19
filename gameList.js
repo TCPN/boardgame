@@ -10,7 +10,7 @@ var gameList = [
 			drawCardFrom: {
 				text: "抽牌方式:",
 				poolDeck: {type: "checkbox", text: "牌庫頂", default: true},
-				threeOpenCard: {type: "checkbox", text: "牌庫頂開三張牌", default: false},
+				openPoolDeck: {type: "checkbox", text: "牌庫頂開三張牌", default: false},
 				outDeck: {type: "checkbox", text: "出牌堆頂", default: false},
 			},
 		},
