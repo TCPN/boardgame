@@ -51,6 +51,16 @@ function PokerGame(users, settings)
 		conPass : 0,
 		isEnd : false,
 	});
+	if(settings.drawCardFrom.openPoolDeck)
+	{
+		Object.assign(thisGame, {
+			openPoolDeck : Object.defineProperties(
+				new Deck(), {
+					'defaultCanSee': {value: new Set(['all'])},
+					'showPart': {value: 'all'},
+				}),
+		});
+	}
 	thisGame.players.forEach(function(p,i){
 		Object.assign(p, {
 			index : i,
@@ -82,6 +92,10 @@ function PokerGame(users, settings)
 		for(let p of thisGame.players)
 			Game.move(thisGame.poolDeck.topCard(5), p.handDeck);
 		Game.move(thisGame.poolDeck.topCard(1), thisGame.outDeck)
+		if(settings.drawCardFrom.openPoolDeck)
+		{
+			Game.move(thisGame.poolDeck.topCard(3), thisGame.openPoolDeck);
+		}
 		thisGame.currentPlayer = thisGame.players[0];
 		
 		var outCardVerify = function outCardVerify(player, choice)
@@ -89,6 +103,8 @@ function PokerGame(users, settings)
 			if(player != thisGame.currentPlayer)
 				return {isLegal: false, message: 'Not the current player'};
 			if(choice == thisGame.poolDeck) //pass
+				return {isLegal: true};
+			else if(settings.drawCardFrom.openPoolDeck && thisGame.openPoolDeck.cards.indexOf(choice) >= 0) // take a card from openPoolDeck
 				return {isLegal: true};
 			else if(thisGame.outDeck.cards.indexOf(choice) >= 0)
 			{
@@ -123,6 +139,7 @@ function PokerGame(users, settings)
 						actions: thisGame.currentPlayer.handDeck.cards
 								.concat(thisGame.poolDeck)
 								.concat((settings.drawCardFrom.outDeck && thisGame.outDeck.length > 1) ? thisGame.outDeck.bottomCard(1) : [])
+								.concat((settings.drawCardFrom.openPoolDeck) ? thisGame.openPoolDeck.cards : [])
 								.filter((v)=>outCardVerify(thisGame.currentPlayer,v).isLegal)
 					}]
 					);
@@ -144,6 +161,13 @@ function PokerGame(users, settings)
 				{
 					thisGame.conPass = 0;
 					Game.move(choice, thisGame.currentPlayer.handDeck);
+				}
+				else if(settings.drawCardFrom.openPoolDeck && thisGame.openPoolDeck.cards.indexOf(choice) >= 0) // choose one of the cards in openPoolDeck
+				{
+					thisGame.conPass = 0;
+					Game.move(choice, thisGame.currentPlayer.handDeck);
+					if(thisGame.poolDeck.length > 0)
+						Game.move(thisGame.poolDeck.topCard(1), thisGame.openPoolDeck);
 				}
 				else
 				{
