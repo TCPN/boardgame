@@ -83,7 +83,7 @@ function PokerGame(users, settings)
 		return thisGame.waitFor;
 	}
 
-	var gameProgress = function* ()
+	var gameProcess = function* ()
 	{
 		Game.move(thisGame.initDeck, thisGame.poolDeck);
 		thisGame.poolDeck.shuffle();
@@ -204,7 +204,7 @@ function PokerGame(users, settings)
 	 this.run = function(input)
 	 {
 		if(runningProgress == undefined)
-			runningProgress = gameProgress();
+			runningProgress = gameProcess();
 		var wa = runningProgress.next(input);
 		if(thisGame.status == "waitForUserAction" || thisGame.status == "GameEnd")
 		{
