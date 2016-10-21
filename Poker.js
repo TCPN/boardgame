@@ -73,14 +73,12 @@ function PokerGame(users, settings)
 		});
 	});
 
-	function waitForActions(message, actions, timelimit, defaultOpt)
+	function waitForActions(status, actions, timelimit, defaultOpt)
 	{
 		timelimit = timelimit || Infinity;
-		if(message == "GameEnd")
-			thisGame.status = message;
-		else
-			thisGame.status = "waitForUserAction";
-		thisGame.message = message;
+		thisGame.status = status;
+		if(thisGame.status == "GameEnd")
+			thisGame.addMessage('gameEnd','The Game is Ended.');
 		thisGame.waitFor = actions;
 		return thisGame.waitFor;
 	}
@@ -128,12 +126,14 @@ function PokerGame(users, settings)
 		
 		while(true)
 		{
-			var msg = "CurrentPlayerPlay";
 			while(1)
 			{
+				thisGame.addMessage('instruct', "Wait for (currentPlayer)'s Action.",
+					{currentPlayer: thisGame.currentPlayer}
+				);
 				//var choice = yield AUserChoice(new Set([thisGame.currentPlayer]), new Set(thisGame.currentPlayer.handDeck.cards).add(thisGame.poolDeck));
 				var choiceResponse = yield waitForActions(
-					msg,
+					"waitForUserAction",
 					[{
 						actor: thisGame.currentPlayer,
 						actions: thisGame.currentPlayer.handDeck.cards
@@ -142,8 +142,9 @@ function PokerGame(users, settings)
 								.concat((settings.drawCardFrom.openPoolDeck) ? thisGame.openPoolDeck.cards : [])
 								.filter((v)=>outCardVerify(thisGame.currentPlayer,v).isLegal)
 					}]
-					);
-				msg = "CurrentPlayerPlayed";
+				);
+				thisGame.resetMessage();
+				thisGame.addMessage('info', "(actor) make an action of (action).", choiceResponse);
 				//verify
 				var choice = choiceResponse.action;
 				var res = outCardVerify(choiceResponse.actor, choice);
@@ -151,7 +152,7 @@ function PokerGame(users, settings)
 					break;
 				else
 				{
-					msg = msg + ', but ' + res.message;
+					thisGame.addMessage('info', "But the action is iilegal. Reason: (message).", res);
 					continue;
 				}
 			}

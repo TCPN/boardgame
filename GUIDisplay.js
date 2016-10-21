@@ -122,12 +122,37 @@ function GUIDisplay(game, screen, handlers)
 		//console.log(this);
 	}
 	
+	// handle message first
+	if(game.message && game.message instanceof Array)
+	{
+		for(var i = 0; i < game.message.length; i ++)
+		{
+			switch(game.message[i].type)
+			{
+				case 'gameStart':
+					handlers.displayMessage('A New Game Started!', 'regular', 5);
+					break;
+				case 'gameEnd':
+					handlers.displayMessage((game.myVictory ? 'YOU WIN!' : 'You Lose.'), 'regular', 5);
+					break;
+				case 'gameBreak':
+					handlers.displayMessage('The Game Break Off! Reason: ' + (game.message[i].reason || 'Unknown'), 'regular', 5);
+					return;
+					break;
+			}
+		}
+	}
+	else
+	{
+		console.log("game message:");
+		console.log(game[k]);
+	}
 	for(var k in game)
 	{
 		if(game[k] == undefined)
 			continue;
-		if(k == 'message' && game[k] == 'GameEnd')
-			handlers.displayMessage((game.myVictory ? 'YOU WIN!' : 'You Lose.'), 'regular', 5); // this is the only place using displayMessage
+		if(k == 'message')
+			continue;
 		if(k == 'players') // assume 'players' contains all players, assume it's Array
 		{
 			screen.setAttribute('playerNumber', game.players.length); // give info about player number
