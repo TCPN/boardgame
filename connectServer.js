@@ -14,7 +14,7 @@ function getName()
 	{
 		var name = prompt("Your name:");
 		document.cookie = "username="+name;
-		return name
+		return name;
 	}
 }
 
@@ -31,7 +31,16 @@ function newUserEnter()
 	user.socket.emit_t = function(event, data)
 	{
 		user.socket.emit(event, data);
-		user.socketTimer.push(setTimeout(function(){user.socket.disconnect();user.socket.connect();}, 5000));
+		user.socketTimer.push(setTimeout(function(){
+			console.log('reconnect...');
+			user.socket.disconnect();
+			user.socket.connect();
+		}, 5000));
+	}
+	function resetAllSocketTimer()
+	{
+		user.socketTimer.forEach(clearTimeout);
+		user.socketTimer = [];
 	}
 	// TODO: is this should be here?
 	function sendGameAction(data)
@@ -211,8 +220,7 @@ function newUserEnter()
 		}
 	});
 	user.socket.on("toClient", function(data){
-		user.socketTimer.forEach(clearTimeout);
-		user.socketTimer = [];
+		resetAllSocketTimer();
 		console.log(user.name + " received somthing.");
 		
 		if(data.cmd == "show")
@@ -283,6 +291,7 @@ function newUserEnter()
 		}
 	});
 	user.socket.on("Error", function(data){
+		resetAllSocketTimer();
 		alert(data.message);
 		console.log(data);
 	});
