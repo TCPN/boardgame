@@ -103,6 +103,10 @@
 <script language="javascript" defer>
 // debugger;
 var gameListDOM = document.getElementById("gameList");
+function cleanGameListItem()
+{
+	Array.from(gameListDOM.getElementsByClassName('item')).forEach(function(v){v.remove();});
+}
 function createGameListItem(gameListItem)
 {
 	var dom = document.createElement('div');
@@ -113,6 +117,7 @@ function createGameListItem(gameListItem)
 }
 function displayGameList(gameList)
 {
+	cleanGameListItem();
 	for(var i=0; i<gameList.length; i++)
 	{
 		gameListDOM.insertBefore(
@@ -121,6 +126,7 @@ function displayGameList(gameList)
 		);
 	}
 	gameListDOM.classList.add('finish');
+	gameListDOM.classList.remove('failed');
 }
 function displayGameListFail(gameList)
 {
