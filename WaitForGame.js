@@ -176,16 +176,28 @@ createUser = function(socket){
 		user.room.game = new PokerGame(user.room.users, data.settings);
 		user.room.game.run();
 	});
+	var deleteTheGame = function(){
+		user.room.game = null;
+		// this is for clean the object, a temporary way
+		user.room.users.forEach((u)=>(u.player = null));
+	};
 	socket.on("game", function(data){
 		//restartTimer();
 		console.log(data);
+		if(!user.room.game)
+		{
+			socket.emit("Error", {"message": 'There is no running game.', "type": 'OperationError'});
+			return;
+		}
 		var waitForForThisUser = user.room.game.waitFor.find((v)=>(v.actor==user.player));
 		var actionsForThisUser = (waitForForThisUser ? waitForForThisUser.actions : []);
 		var actionObj = {
 			actor: user.player,
 			action: actionsForThisUser[data.action],
 		};
-		user.room.game.run(actionObj);
+		var keepTheGame = user.room.game.run(actionObj);
+		if(!keepTheGame)
+			deleteTheGame();
 	});
 	socket.on("disconnect", function(){ 
 		/*
@@ -203,6 +215,18 @@ createUser = function(socket){
 		{
 			user.room.users.remove(user);
 			user.room.updateUserInfo();
+			// temporary way: to inform a player leave
+			if(user.player != undefined)
+			{
+				deleteTheGame();
+				user.room.users.forEach((u)=>u.takeGameMessage({
+					message:[{
+						type:'gameBreak',
+						text: 'The Game Break Off.',
+						reason: 'A Player ('+user.name+') Left.'
+					}]
+				}));
+			}
 		}
 		console.log(user.name + " disconnect");
 	});

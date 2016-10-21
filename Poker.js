@@ -218,7 +218,11 @@ function PokerGame(users, settings)
 				console.log(e);
 			}
 		}
-		return wa;
+		//return wa;
+		if(thisGame.status == "GameEnd")
+			return false; // go on?
+		else
+			return true; // go on?
 	 };
 }
 
