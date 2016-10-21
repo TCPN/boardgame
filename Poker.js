@@ -195,8 +195,11 @@ function PokerGame(users, settings)
 				s += c.point;
 			p.point = s;
 		});
-		thisGame.scores = thisGame.players.map((p)=>p.handDeck.length);
-		thisGame.winner = thisGame.players.reduce((bp,cp)=>(cp.point < bp.point ? cp : bp),thisGame.currentPlayer);
+		thisGame.scores = thisGame.players.map((p)=>({cardNum: p.handDeck.length, cardPointSum: p.point}));
+		thisGame.winner = thisGame.players.reduce(
+			(bp,cp)=>((cp.handDeck.length < bp.handDeck.length || cp.point < bp.point) ? cp : bp),
+			thisGame.currentPlayer
+		);
 		return waitForActions('GameEnd', []);
 	};
 	
