@@ -130,6 +130,7 @@ function GUIDisplay(game, screen, handlers)
 			switch(game.message[i].type)
 			{
 				case 'gameStart':
+					screen.innerHTML = '';
 					handlers.displayMessage('A New Game Started!', 'regular', 5);
 					break;
 				case 'gameEnd':
