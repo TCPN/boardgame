@@ -129,6 +129,7 @@
 	display: flex;
 	justify-content: center;
 	align-items: center;
+	text-align: center;
 	transition-property: top;
 	transition-duration: 1s;
 	transition-timing-function: ease-out;
