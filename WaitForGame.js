@@ -161,14 +161,13 @@ createUser = function(socket){
 		
 		if(user.room.users.length == 2)
 		{
-			console.log("Let's Play!");
-			
+			//console.log("Let's Play!");
 			// TODO: refactor this
 		}
 		else
 		{
-			socket.emit("waitPlayersJoin", {userNumber:user.room.users.length});
-			console.log("waitPlayersJoin");
+			// socket.emit("waitPlayersJoin", {userNumber:user.room.users.length});
+			//console.log("waitPlayersJoin");
 		}
 	});
 	socket.on("startGame", function(data){
@@ -183,7 +182,7 @@ createUser = function(socket){
 	};
 	socket.on("game", function(data){
 		//restartTimer();
-		console.log(data);
+		console.log(data); // not always looks correct, because actor index is relative
 		if(!user.room.game)
 		{
 			socket.emit("Error", {"message": 'There is no running game.', "type": 'OperationError'});

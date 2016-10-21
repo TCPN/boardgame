@@ -33,7 +33,11 @@ function PokerGame(users, settings)
 		throw new Error("Inproper Number of Players");
 	var thisGame = Game.apply(this).setPlayerNumber(users.length);
 	// assume users is Array
-	if(users != undefined) users.forEach(function(u,i){u.player = thisGame.players[i];u.player.user=u;});
+	if(users != undefined)
+		users.forEach(function(u,i){
+			u.player = thisGame.players[i];
+			u.player.user = u;
+		});
 	thisGame.skipFieldWhenView.add('initDeck');
 	Object.assign(thisGame, {
 		initDeck : cards,
@@ -146,6 +150,7 @@ function PokerGame(users, settings)
 				thisGame.resetMessage();
 				thisGame.addMessage('info', "(actor) make an action of (action).", choiceResponse);
 				//verify
+				//console.log(choiceResponse); //shows too much
 				var choice = choiceResponse.action;
 				var res = outCardVerify(choiceResponse.actor, choice);
 				if(res.isLegal)
@@ -200,6 +205,8 @@ function PokerGame(users, settings)
 			(bp,cp)=>((cp.handDeck.length < bp.handDeck.length || cp.point < bp.point) ? cp : bp),
 			thisGame.currentPlayer
 		);
+		// TODO: a common structure of a Game should be set, especially for gameProcess
+		// it should include these necessary messages
 		return waitForActions('GameEnd', []);
 	};
 	
@@ -211,6 +218,7 @@ function PokerGame(users, settings)
 		var wa = runningProgress.next(input);
 		if(thisGame.status == "waitForUserAction" || thisGame.status == "GameEnd")
 		{
+			// TODO: this part should go into WaitForGame.js ?
 			console.log(thisGame.status);
 			try{
 				thisGame.players.forEach(function(p){
